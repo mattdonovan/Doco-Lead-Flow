@@ -2,7 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertQuoteRequestSchema } from "@shared/schema";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendQuoteEmail(quote: {
   firstName: string;
@@ -17,25 +19,10 @@ async function sendQuoteEmail(quote: {
   additionalDetails?: string | null;
   hasInsuranceClaim?: boolean | null;
 }) {
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-  const smtpPort = parseInt(process.env.SMTP_PORT || "587");
-
-  if (!smtpUser || !smtpPass) {
-    console.warn("SMTP credentials not configured — skipping email notification");
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not configured — skipping email notification");
     return;
   }
-
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -70,13 +57,17 @@ async function sendQuoteEmail(quote: {
     </div>
   `;
 
-  await transporter.sendMail({
-    from: smtpUser,
+  const { error } = await resend.emails.send({
+    from: "DOCO Exteriors <onboarding@resend.dev>",
     to: "iam.mattdonovan@gmail.com",
     replyTo: quote.email,
     subject: `New Estimate Request: ${quote.firstName} ${quote.lastName} — ${quote.services.join(", ")}`,
     html,
   });
+
+  if (error) {
+    throw new Error(`Resend error: ${error.message}`);
+  }
 }
 
 export async function registerRoutes(

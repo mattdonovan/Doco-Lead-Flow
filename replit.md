@@ -6,7 +6,7 @@ Lead-gen website for DOCO Exteriors, a Minneapolis exterior contractor owned by 
 ## Tech Stack
 - **Frontend**: React + Vite, Wouter (routing), Framer Motion, TanStack Query, Tailwind CSS
 - **Backend**: Express.js, Drizzle ORM, PostgreSQL
-- **Email**: Nodemailer (SMTP) — sends form submissions to iam.mattdonovan@gmail.com
+- **Email**: Resend API — sends form submissions to iam.mattdonovan@gmail.com
 
 ## Design System
 - **Dark background**: `#0A0A0A`
@@ -41,11 +41,10 @@ Lead-gen website for DOCO Exteriors, a Minneapolis exterior contractor owned by 
 - `/client/public/logo-footer.svg` — Footer logo (56px height)
 
 ## Email Setup
-Requires SMTP credentials in environment variables:
-- `SMTP_USER` — SMTP username/email
-- `SMTP_PASS` — SMTP password/app password
-- `SMTP_HOST` — SMTP host (default: smtp.gmail.com)
-- `SMTP_PORT` — SMTP port (default: 587)
+Uses Resend API for transactional emails:
+- `RESEND_API_KEY` — Resend API key (configured)
+- Sends from: `onboarding@resend.dev` (Resend default sender)
+- Once a custom domain is verified in Resend, update the `from` address in `server/routes.ts`
 
 ## Database
 - PostgreSQL with `quoteRequests` table for form submissions
