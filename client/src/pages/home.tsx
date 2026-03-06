@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { GuidedProcess, CTASection, SiteFooter, ScrollToTop } from "@/components/shared-sections";
+import { GuidedProcess, CTASection, SiteFooter } from "@/components/shared-sections";
 
 const SERVICE_LINKS: Record<string, string> = {
   Roofing: "/services/roofing",
@@ -30,7 +30,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-      <ScrollToTop />
       {/* NAV */}
       <nav
         data-testid="nav-main"

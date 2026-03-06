@@ -1,9 +1,8 @@
-import { SiteNav, GuidedProcess, CTASection, SiteFooter, ScrollToTop } from "@/components/shared-sections";
+import { SiteNav, GuidedProcess, CTASection, SiteFooter } from "@/components/shared-sections";
 
 export default function About() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-      <ScrollToTop />
       <SiteNav variant="subpage" />
 
       <section className="pt-[68px] bg-[#0A0A0A]">

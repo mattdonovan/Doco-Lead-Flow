@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Check } from "lucide-react";
-import { SiteNav, GuidedProcess, CTASection, SiteFooter, ScrollToTop, OtherServicesSection } from "@/components/shared-sections";
+import { SiteNav, GuidedProcess, CTASection, SiteFooter, OtherServicesSection } from "@/components/shared-sections";
 
 interface ServiceData {
   slug: string;
@@ -110,6 +111,10 @@ export default function ServicePage() {
   const [, navigate] = useLocation();
   const service = SERVICES[params.slug || ""];
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [params.slug]);
+
   if (!service) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -124,7 +129,6 @@ export default function ServicePage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-      <ScrollToTop />
       <SiteNav variant="subpage" />
 
       {/* Hero */}

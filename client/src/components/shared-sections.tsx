@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Phone, Mail, MapPin, Shield } from "lucide-react";
@@ -259,20 +259,6 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
       )}
     </nav>
   );
-}
-
-export function ScrollToTop() {
-  const [location] = useLocation();
-  const prevLocation = useRef(location);
-
-  useEffect(() => {
-    if (prevLocation.current !== location) {
-      window.scrollTo(0, 0);
-      prevLocation.current = location;
-    }
-  }, [location]);
-
-  return null;
 }
 
 const ALL_SERVICES = [
