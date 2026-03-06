@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Facebook, Instagram, Linkedin, Phone, Mail, MapPin, Shield } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Phone, Mail, MapPin, Shield } from "lucide-react";
 
 const PROCESS_STEPS = [
   { num: "01", title: "Free Inspection", desc: "Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work." },
@@ -17,6 +17,11 @@ const PROCESS_STEPS = [
 const SLIDE_COLORS = [
   "bg-[#0D2B2E]", "bg-[#0B2035]", "bg-[#162830]", "bg-[#0F1F2B]",
   "bg-[#192B28]", "bg-[#1A2030]", "bg-[#1C2820]", "bg-[#101E2A]",
+];
+
+const CTA_BG_COLORS = [
+  "#0E2233", "#0D2B2E", "#0B2035", "#162830",
+  "#0F1F2B", "#192B28", "#1A2030", "#101E2A",
 ];
 
 export function GuidedProcess() {
@@ -97,9 +102,25 @@ export function GuidedProcess() {
 
 export function CTASection() {
   const [, navigate] = useLocation();
+  const [colorIndex, setColorIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setColorIndex((prev) => (prev + 1) % CTA_BG_COLORS.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section id="contact" className="bg-[#0E2233] text-white px-8 md:px-20 py-24 grid grid-cols-1 lg:grid-cols-2 items-center gap-16" style={{ borderTop: "1px solid rgba(88,227,234,0.1)" }}>
+    <section
+      id="contact"
+      className="text-white px-8 md:px-20 py-24 grid grid-cols-1 lg:grid-cols-2 items-center gap-16"
+      style={{
+        borderTop: "1px solid rgba(88,227,234,0.1)",
+        backgroundColor: CTA_BG_COLORS[colorIndex],
+        transition: "background-color 4s ease-in-out",
+      }}
+    >
       <div>
         <h2 className="text-[clamp(32px,4vw,56px)] font-black tracking-tighter leading-[1.05]" data-testid="text-cta-headline">
           Ready for a<br/><span className="text-[#58E3EA]">Free Estimate?</span>
@@ -188,7 +209,7 @@ export function SiteFooter() {
   );
 }
 
-export function SiteNav() {
+export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" }) {
   const [, navigate] = useLocation();
 
   return (
@@ -197,22 +218,97 @@ export function SiteNav() {
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 h-[68px] bg-[#0A0A0A]/95 backdrop-blur-xl"
       style={{ borderBottom: "1px solid rgba(88,227,234,0.12)" }}
     >
-      <button onClick={() => navigate("/")} className="flex items-center" data-testid="link-home-logo">
-        <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
-      </button>
-      <ul className="hidden md:flex items-center gap-9 list-none">
-        <li><button onClick={() => navigate("/")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-home">Home</button></li>
-        <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
-        <li><button onClick={() => navigate("/#services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
-        <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
-      </ul>
-      <button
-        onClick={() => navigate("/estimate")}
-        className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold tracking-wider uppercase px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
-        data-testid="button-nav-estimate"
-      >
-        Get Free Estimate
-      </button>
+      <div className="flex items-center gap-4">
+        <button onClick={() => navigate("/")} className="flex items-center transition-transform duration-200 hover:scale-110 focus:scale-110 focus:outline-none" data-testid="link-home-logo">
+          <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
+        </button>
+        {variant === "subpage" && (
+          <button
+            onClick={() => navigate("/")}
+            className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors flex items-center gap-1.5"
+            data-testid="link-nav-back-home"
+          >
+            <ArrowRight size={14} strokeWidth={2.5} className="rotate-180" />
+            Home
+          </button>
+        )}
+      </div>
+      {variant === "subpage" ? (
+        <button
+          onClick={() => navigate("/estimate")}
+          className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold tracking-wider uppercase px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+          data-testid="button-nav-estimate"
+        >
+          Get Free Estimate
+        </button>
+      ) : (
+        <>
+          <ul className="hidden md:flex items-center gap-9 list-none">
+            <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
+            <li><button onClick={() => navigate("/#services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
+            <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
+          </ul>
+          <button
+            onClick={() => navigate("/estimate")}
+            className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold tracking-wider uppercase px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+            data-testid="button-nav-estimate"
+          >
+            Get Free Estimate
+          </button>
+        </>
+      )}
     </nav>
+  );
+}
+
+export function ScrollToTop() {
+  const [location] = useLocation();
+  const prevLocation = useRef(location);
+
+  useEffect(() => {
+    if (prevLocation.current !== location) {
+      window.scrollTo(0, 0);
+      prevLocation.current = location;
+    }
+  }, [location]);
+
+  return null;
+}
+
+const ALL_SERVICES = [
+  { tag: "Roofing", title: "Roof Replacement & Repair", desc: "From storm damage to full replacements, we handle asphalt, metal, and architectural shingles with precision.", img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80", slug: "roofing" },
+  { tag: "Siding", title: "Siding Installation", desc: "Fiber cement, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.", img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80", slug: "siding" },
+  { tag: "Windows", title: "Window Replacement", desc: "Energy-efficient, Minnesota-rated windows installed to keep heat in and cold out — lowering your bills year-round.", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&q=80", slug: "windows" },
+  { tag: "Gutters", title: "Gutter Systems", desc: "Seamless gutters, guards, and downspout systems that protect your foundation through Minnesota's harshest seasons.", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80", slug: "gutters" },
+];
+
+export function OtherServicesSection({ currentSlug }: { currentSlug: string }) {
+  const [, navigate] = useLocation();
+  const otherServices = ALL_SERVICES.filter((s) => s.slug !== currentSlug);
+
+  return (
+    <section className="bg-[#111111] px-8 md:px-20 pt-24 pb-0">
+      <h2 className="text-[clamp(28px,3vw,42px)] font-extrabold tracking-tight text-white mb-14" data-testid="text-other-services-headline">Our Other Services</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5">
+        {otherServices.map((svc, i) => (
+          <div
+            key={svc.slug}
+            className="relative overflow-hidden aspect-[3/4] cursor-pointer bg-[#1A1A1A] group"
+            onClick={() => navigate(`/services/${svc.slug}`)}
+            data-testid={`card-other-service-${i}`}
+          >
+            <img src={svc.img} alt={svc.tag} className="w-full h-full object-cover transition-transform duration-600 opacity-70 group-hover:scale-[1.06] group-hover:opacity-85" />
+            <div className="absolute bottom-0 left-0 right-0 p-7" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, transparent 100%)" }}>
+              <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest uppercase px-2.5 py-1 rounded-sm mb-3">{svc.tag}</span>
+              <h3 className="text-xl font-bold mb-2.5 tracking-tight text-white">{svc.title}</h3>
+              <p className="text-[13px] text-white/70 leading-relaxed mb-4">{svc.desc}</p>
+              <span className="text-[12px] font-bold tracking-wider uppercase text-[#58E3EA] flex items-center gap-1.5 transition-all group-hover:gap-2.5">
+                Learn more <ArrowUpRight size={13} strokeWidth={2.5} />
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

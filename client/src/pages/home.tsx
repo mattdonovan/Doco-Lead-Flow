@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { GuidedProcess, CTASection, SiteFooter } from "@/components/shared-sections";
+import { GuidedProcess, CTASection, SiteFooter, ScrollToTop } from "@/components/shared-sections";
 
 const SERVICE_LINKS: Record<string, string> = {
   Roofing: "/services/roofing",
@@ -30,6 +30,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <ScrollToTop />
       {/* NAV */}
       <nav
         data-testid="nav-main"
@@ -38,12 +39,11 @@ export default function Home() {
         }`}
         style={{ borderBottom: "1px solid rgba(88,227,234,0.12)" }}
       >
-        <button onClick={() => navigate("/")} className="flex items-center" data-testid="link-home-logo">
+        <button onClick={() => scrollTo("home")} className="flex items-center transition-transform duration-200 hover:scale-110 focus:scale-110 focus:outline-none" data-testid="link-home-logo">
           <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
         </button>
         <ul className="hidden md:flex items-center gap-9 list-none">
-          <li><button onClick={() => scrollTo("home")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-home"><span className="text-[#58E3EA] mr-1">&#9658;</span>Home</button></li>
-          <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
+          <li><button onClick={() => scrollTo("about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
           <li><button onClick={() => scrollTo("services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
           <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
         </ul>
