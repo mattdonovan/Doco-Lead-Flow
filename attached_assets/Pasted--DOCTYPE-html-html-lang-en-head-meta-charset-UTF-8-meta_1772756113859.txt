@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DOCO Exteriors – Minneapolis Roofing, Siding, Windows & Gutters</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --cyan: #58E3EA;
+    --cyan-dark: #3ABFC6;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --dark2: #1A1A1A;
+    --off-white: #F5F4F0;
+    --font: 'Montserrat', sans-serif;
+    --slide-0: #0D2B2E;
+    --slide-1: #0B2035;
+    --slide-2: #162830;
+    --slide-3: #0F1F2B;
+    --slide-4: #192B28;
+    --slide-5: #1A2030;
+    --slide-6: #1C2820;
+    --slide-7: #101E2A;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font); background: var(--black); color: white; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 68px;
+    background: rgba(10,10,10,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(88,227,234,0.12);
+  }
+  .nav-logo { display: flex; align-items: center; text-decoration: none; }
+  .nav-logo svg { height: 32px; width: auto; }
+  .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+  .nav-links a.active { color: white; }
+  .nav-dot { color: var(--cyan); margin-right: 4px; }
+  .btn-nav {
+    background: var(--cyan); color: var(--black); font-family: var(--font);
+    font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    border: none; padding: 10px 22px; border-radius: 4px; cursor: pointer; text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-nav:hover { background: var(--cyan-dark); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+    padding-top: 68px; background: var(--black);
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 80px 64px 80px 80px;
+  }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+  }
+  .hero-eyebrow::before { content: ''; width: 32px; height: 2px; background: var(--cyan); }
+  .hero-left h1 {
+    font-size: clamp(42px, 5.5vw, 72px); font-weight: 800; line-height: 1.05;
+    letter-spacing: -0.02em; margin-bottom: 28px;
+  }
+  .hero-left h1 span { color: var(--cyan); }
+  .hero-left p {
+    font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.65);
+    max-width: 460px; margin-bottom: 44px;
+  }
+  .hero-actions { display: flex; align-items: center; gap: 24px; }
+  .btn-primary {
+    background: var(--cyan); color: var(--black); font-family: var(--font);
+    font-size: 14px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    border: none; padding: 16px 32px; border-radius: 4px; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 10px; transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--cyan-dark); transform: translateY(-2px); }
+  .btn-ghost {
+    color: white; font-family: var(--font); font-size: 13px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--cyan); border-color: var(--cyan); }
+  .hero-right { position: relative; overflow: hidden; background: var(--dark2); }
+  .hero-img-grid { display: grid; grid-template-rows: 1fr 1fr; height: 100%; }
+  .hero-img-grid > div { overflow: hidden; }
+  .hero-img-grid img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); transition: transform 6s ease; }
+  .hero-img-grid > div:hover img { transform: scale(1); }
+  .hero-img-grid > div:first-child { border-bottom: 3px solid var(--black); }
+
+  /* ABOUT */
+  .section-about {
+    background: var(--off-white); color: var(--black);
+    display: grid; grid-template-columns: 1fr 1fr; min-height: 600px;
+  }
+  .about-img { overflow: hidden; }
+  .about-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .about-content {
+    padding: 100px 80px 100px 72px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .about-content h2 {
+    font-size: clamp(34px, 4vw, 52px); font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.02em; margin-bottom: 28px; color: var(--black);
+  }
+  .about-content p { font-size: 15px; line-height: 1.75; color: #444; margin-bottom: 20px; max-width: 480px; }
+  .about-link {
+    color: var(--black); font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 8px;
+    border-bottom: 2px solid var(--black); padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .about-link:hover { color: var(--cyan-dark); border-color: var(--cyan-dark); }
+
+  /* NUMBERS */
+  .section-numbers {
+    background: var(--off-white); padding: 80px 80px 100px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+  }
+  .section-numbers h2 {
+    font-size: clamp(28px, 3vw, 40px); font-weight: 800; color: var(--black);
+    letter-spacing: -0.02em; margin-bottom: 48px;
+  }
+  .numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .number-card { background: white; padding: 40px 32px; border-radius: 4px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+  .number-card .num { font-size: 52px; font-weight: 900; color: var(--black); letter-spacing: -0.03em; line-height: 1; margin-bottom: 12px; }
+  .number-card .num span { color: var(--cyan-dark); }
+  .number-card .label { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #888; line-height: 1.4; }
+
+  /* SERVICES */
+  .section-services { background: var(--dark); padding: 100px 80px 0; }
+  .services-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; }
+  .services-header h2 { font-size: clamp(28px, 3vw, 42px); font-weight: 800; letter-spacing: -0.02em; }
+  .services-nav { display: flex; gap: 12px; }
+  .svc-nav-btn {
+    width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.2); background: transparent;
+    color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    border-radius: 2px; transition: background 0.2s, border-color 0.2s;
+  }
+  .svc-nav-btn:hover { background: var(--cyan); border-color: var(--cyan); color: var(--black); }
+  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+  .service-card { position: relative; overflow: hidden; aspect-ratio: 3/4; cursor: pointer; background: var(--dark2); }
+  .service-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; opacity: 0.7; }
+  .service-card:hover img { transform: scale(1.06); opacity: 0.85; }
+  .service-card-content {
+    position: absolute; bottom: 0; left: 0; right: 0; padding: 32px 28px;
+    background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, transparent 100%);
+  }
+  .service-tag {
+    display: inline-block; background: var(--cyan); color: var(--black);
+    font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 2px; margin-bottom: 12px;
+  }
+  .service-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em; }
+  .service-card p { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 16px; }
+  .service-card-link {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--cyan); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: gap 0.2s;
+  }
+  .service-card:hover .service-card-link { gap: 10px; }
+
+  /* PROCESS (inside services section) */
+  .process-wrap { margin-top: 80px; padding-bottom: 100px; }
+  .process-wrap h2 { font-size: clamp(26px, 3vw, 38px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 48px; }
+  .process-body { display: grid; grid-template-columns: 280px 1fr; }
+
+  .process-timeline { border-right: 1px solid rgba(255,255,255,0.07); display: flex; flex-direction: column; }
+  .process-step { display: flex; align-items: flex-start; padding: 16px 24px 16px 0; cursor: pointer; }
+  .process-step:hover:not(.active) { opacity: 0.8; }
+  .step-connector { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 32px; margin-right: 12px; padding-top: 2px; }
+  .step-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.18); background: transparent; transition: all 0.25s; }
+  .step-line { width: 1px; flex: 1; min-height: 24px; background: rgba(255,255,255,0.07); margin-top: 5px; }
+  .process-step:last-child .step-line { display: none; }
+  .step-label { display: flex; flex-direction: column; gap: 3px; }
+  .step-num { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.28); transition: color 0.25s; }
+  .step-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.42); line-height: 1.3; transition: color 0.25s; }
+  .process-step.active .step-dot { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(88,227,234,0.13); }
+  .process-step.active .step-line { background: rgba(88,227,234,0.18); }
+  .process-step.active .step-num { color: var(--cyan); }
+  .process-step.active .step-title { color: white; font-weight: 700; }
+  .process-step:hover:not(.active) .step-title { color: rgba(255,255,255,0.72); }
+
+  /* Slide panels */
+  .process-panels { overflow: hidden; }
+  .process-panel { display: none; min-height: 480px; }
+  .process-panel.active { display: grid; grid-template-columns: 1fr 1fr; animation: panelFade 0.38s ease both; }
+  @keyframes panelFade { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
+
+  .panel-visual {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    border-right: 1px solid rgba(255,255,255,0.05);
+  }
+  .panel-visual-placeholder {
+    width: 160px; height: 160px; border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px;
+  }
+  .panel-visual-placeholder span { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.18); text-align: center; }
+
+  .panel-text { padding: 56px 52px; display: flex; flex-direction: column; justify-content: center; }
+  .panel-step-tag { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cyan); margin-bottom: 18px; }
+  .process-panel h3 { font-size: clamp(20px, 2.2vw, 30px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 18px; color: white; }
+  .process-panel p { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.58); max-width: 360px; }
+
+  .process-panel[data-panel="0"] { background: var(--slide-0); }
+  .process-panel[data-panel="1"] { background: var(--slide-1); }
+  .process-panel[data-panel="2"] { background: var(--slide-2); }
+  .process-panel[data-panel="3"] { background: var(--slide-3); }
+  .process-panel[data-panel="4"] { background: var(--slide-4); }
+  .process-panel[data-panel="5"] { background: var(--slide-5); }
+  .process-panel[data-panel="6"] { background: var(--slide-6); }
+  .process-panel[data-panel="7"] { background: var(--slide-7); }
+
+  /* CTA */
+  .section-cta {
+    background: #0E2233;
+    color: white; padding: 100px 80px;
+    display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 60px;
+    border-top: 1px solid rgba(88,227,234,0.1);
+  }
+  .cta-left h2 { font-size: clamp(32px, 4vw, 56px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; }
+  .cta-left h2 span { color: var(--cyan); }
+  .cta-left p { margin-top: 20px; font-size: 16px; color: rgba(255,255,255,0.5); line-height: 1.65; max-width: 440px; }
+  .cta-form { display: flex; flex-direction: column; gap: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .cta-form input, .cta-form select, .cta-form textarea {
+    width: 100%; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1);
+    padding: 14px 16px; font-family: var(--font); font-size: 14px; font-weight: 500;
+    color: white; border-radius: 4px; outline: none; transition: border-color 0.2s, background 0.2s;
+  }
+  .cta-form input::placeholder, .cta-form textarea::placeholder { color: rgba(255,255,255,0.28); }
+  .cta-form input:focus, .cta-form select:focus, .cta-form textarea:focus { border-color: var(--cyan); background: rgba(88,227,234,0.05); }
+  .cta-form textarea { resize: none; min-height: 90px; }
+  .cta-form select { color: rgba(255,255,255,0.45); appearance: none; cursor: pointer; }
+  .cta-form select option { background: #0E2233; color: white; }
+  .btn-submit {
+    width: 100%; background: var(--cyan); color: var(--black); font-family: var(--font);
+    font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    border: none; padding: 16px; border-radius: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-submit:hover { background: var(--cyan-dark); transform: translateY(-2px); }
+
+  /* FOOTER */
+  footer { background: var(--dark); border-top: 1px solid rgba(88,227,234,0.1); padding: 80px 80px 40px; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .footer-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .footer-brand p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 280px; }
+  .footer-social { display: flex; gap: 12px; margin-top: 4px; }
+  .social-btn { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.15); border-radius: 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+  .social-btn:hover { border-color: var(--cyan); background: rgba(88,227,234,0.1); }
+  .footer-col h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--cyan); margin-bottom: 20px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .footer-col li a { font-size: 13px; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; }
+  .footer-col li a:hover { color: white; }
+  .footer-bottom { padding-top: 32px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-bottom p { font-size: 12px; color: rgba(255,255,255,0.3); }
+  .footer-bottom a { color: var(--cyan); text-decoration: none; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.8s ease both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.25s; }
+  .delay-3 { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg width="568" height="202" viewBox="0 0 568 202" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:28px;width:auto;"><path d="M496.773 136.802C486.583 136.802 477.093 135.083 468.304 131.644C459.643 128.204 452.127 123.428 445.758 117.314C439.39 111.072 434.422 103.812 430.855 95.5324C427.289 87.2529 425.506 78.2092 425.506 68.4012C425.506 58.5932 427.289 49.5495 430.855 41.27C434.422 32.9905 439.39 25.7937 445.758 19.6797C452.127 13.4382 459.643 8.5979 468.304 5.15874C476.966 1.71958 486.455 0 496.773 0C506.963 0 516.325 1.71958 524.859 5.15874C533.521 8.47053 541.036 13.2472 547.405 19.4886C553.901 25.6027 558.869 32.7994 562.308 41.0789C565.875 49.3584 567.658 58.4658 567.658 68.4012C567.658 78.3365 565.875 87.444 562.308 95.7234C558.869 104.003 553.901 111.263 547.405 117.505C541.036 123.619 533.521 128.396 524.859 131.835C516.325 135.146 506.963 136.802 496.773 136.802ZM496.773 119.798C504.161 119.798 510.975 118.524 517.217 115.976C523.586 113.429 529.063 109.862 533.648 105.277C538.361 100.564 541.991 95.0865 544.539 88.8451C547.214 82.6036 548.551 75.789 548.551 68.4012C548.551 61.0133 547.214 54.1987 544.539 47.9572C541.991 41.7158 538.361 36.3023 533.648 31.7167C529.063 27.0038 523.586 23.3736 517.217 20.8261C510.975 18.2785 504.161 17.0048 496.773 17.0048C489.258 17.0048 482.316 18.2785 475.947 20.8261C469.705 23.3736 464.228 27.0038 459.515 31.7167C454.802 36.3023 451.108 41.7158 448.433 47.9572C445.886 54.1987 444.612 61.0133 444.612 68.4012C444.612 75.789 445.886 82.6036 448.433 88.8451C451.108 95.0865 454.802 100.564 459.515 105.277C464.228 109.862 469.705 113.429 475.947 115.976C482.316 118.524 489.258 119.798 496.773 119.798Z" fill="white"/><path d="M366.656 136.802C356.466 136.802 347.04 135.146 338.379 131.835C329.844 128.396 322.393 123.619 316.024 117.505C309.783 111.263 304.879 104.003 301.312 95.7234C297.746 87.444 295.962 78.3365 295.962 68.4012C295.962 58.4658 297.746 49.3584 301.312 41.0789C304.879 32.7994 309.846 25.6027 316.215 19.4886C322.584 13.2472 330.036 8.47053 338.57 5.15874C347.231 1.71958 356.657 0 366.847 0C377.165 0 386.654 1.78327 395.316 5.34981C404.105 8.78897 411.556 13.9477 417.671 20.8261L405.251 32.8631C400.156 27.5133 394.424 23.5646 388.055 21.0171C381.687 18.3422 374.872 17.0048 367.612 17.0048C360.096 17.0048 353.091 18.2785 346.594 20.8261C340.226 23.3736 334.685 26.9401 329.972 31.5257C325.259 36.1112 321.565 41.5884 318.89 47.9572C316.343 54.1987 315.069 61.0133 315.069 68.4012C315.069 75.789 316.343 82.6673 318.89 89.0362C321.565 95.2776 325.259 100.691 329.972 105.277C334.685 109.862 340.226 113.429 346.594 115.976C353.091 118.524 360.096 119.798 367.612 119.798C374.872 119.798 381.687 118.524 388.055 115.976C394.424 113.301 400.156 109.225 405.251 103.748L417.671 115.785C411.556 122.664 404.105 127.886 395.316 131.453C386.654 135.019 377.101 136.802 366.656 136.802Z" fill="white"/><path d="M212.497 136.802C202.307 136.802 192.817 135.083 184.028 131.644C175.367 128.204 167.851 123.428 161.483 117.314C155.114 111.072 150.146 103.812 146.58 95.5324C143.013 87.2529 141.23 78.2092 141.23 68.4012C141.23 58.5932 143.013 49.5495 146.58 41.27C150.146 32.9905 155.114 25.7937 161.483 19.6797C167.851 13.4382 175.367 8.5979 184.028 5.15874C192.69 1.71958 202.179 0 212.497 0C222.687 0 232.049 1.71958 240.583 5.15874C249.245 8.47053 256.76 13.2472 263.129 19.4886C269.625 25.6027 274.593 32.7994 278.032 41.0789C281.599 49.3584 283.382 58.4658 283.382 68.4012C283.382 78.3365 281.599 87.444 278.032 95.7234C274.593 104.003 269.625 111.263 263.129 117.505C256.76 123.619 249.245 128.396 240.583 131.835C232.049 135.146 222.687 136.802 212.497 136.802ZM212.497 119.798C219.885 119.798 226.699 118.524 232.941 115.976C239.31 113.429 244.787 109.862 249.372 105.277C254.085 100.564 257.716 95.0865 260.263 88.8451C262.938 82.6036 264.275 75.789 264.275 68.4012C264.275 61.0133 262.938 54.1987 260.263 47.9572C257.716 41.7158 254.085 36.3023 249.372 31.7167C244.787 27.0038 239.31 23.3736 232.941 20.8261C226.699 18.2785 219.885 17.0048 212.497 17.0048C204.982 17.0048 198.04 18.2785 191.671 20.8261C185.429 23.3736 179.952 27.0038 175.239 31.7167C170.526 36.3023 166.832 41.7158 164.158 47.9572C161.61 54.1987 160.336 61.0133 160.336 68.4012C160.336 75.789 161.61 82.6036 164.158 88.8451C166.832 95.0865 170.526 100.564 175.239 105.277C179.952 109.862 185.429 113.429 191.671 115.976C198.04 118.524 204.982 119.798 212.497 119.798Z" fill="white"/><path d="M0 135.274V1.5285H56.3641C70.6303 1.5285 83.1769 4.33079 94.0039 9.93536C104.958 15.5399 113.429 23.3736 119.415 33.4363C125.53 43.4991 128.587 55.154 128.587 68.4012C128.587 81.6483 125.53 93.3033 119.415 103.366C113.429 113.429 104.958 121.262 94.0039 126.867C83.1769 132.472 70.6303 135.274 56.3641 135.274H0ZM19.1065 118.651H55.2177C66.2995 118.651 75.8527 116.549 83.8774 112.346C92.0295 108.143 98.3347 102.283 102.793 94.7681C107.251 87.1255 109.48 78.3365 109.48 68.4012C109.48 58.3384 107.251 49.5494 102.793 42.0342C98.3347 34.519 92.0295 28.6597 83.8774 24.4563C75.8527 20.2529 66.2995 18.1511 55.2177 18.1511H19.1065V118.651Z" fill="white"/><path d="M487.984 201.985C485.693 201.985 483.489 201.618 481.374 200.883C479.288 200.12 477.673 199.15 476.527 197.975L477.805 195.463C478.892 196.521 480.346 197.417 482.167 198.151C484.018 198.856 485.957 199.209 487.984 199.209C489.923 199.209 491.494 198.974 492.699 198.504C493.933 198.005 494.829 197.344 495.387 196.521C495.974 195.698 496.268 194.788 496.268 193.789C496.268 192.585 495.916 191.615 495.21 190.881C494.535 190.146 493.639 189.573 492.523 189.162C491.406 188.722 490.172 188.34 488.821 188.017C487.47 187.693 486.118 187.356 484.767 187.003C483.416 186.621 482.167 186.122 481.022 185.505C479.905 184.888 478.995 184.08 478.29 183.081C477.614 182.053 477.276 180.717 477.276 179.071C477.276 177.544 477.673 176.148 478.466 174.885C479.288 173.593 480.537 172.565 482.211 171.801C483.886 171.008 486.03 170.611 488.645 170.611C490.378 170.611 492.097 170.861 493.8 171.36C495.504 171.83 496.973 172.491 498.207 173.343L497.105 175.943C495.783 175.062 494.373 174.415 492.875 174.004C491.406 173.593 489.981 173.387 488.601 173.387C486.75 173.387 485.222 173.637 484.018 174.136C482.814 174.636 481.918 175.311 481.33 176.163C480.772 176.986 480.493 177.926 480.493 178.983C480.493 180.188 480.831 181.157 481.506 181.892C482.211 182.626 483.122 183.199 484.238 183.61C485.384 184.021 486.633 184.389 487.984 184.712C489.335 185.035 490.672 185.387 491.994 185.769C493.345 186.151 494.579 186.651 495.695 187.267C496.841 187.855 497.752 188.648 498.427 189.647C499.132 190.646 499.485 191.953 499.485 193.569C499.485 195.067 499.073 196.462 498.251 197.755C497.428 199.018 496.165 200.046 494.461 200.839C492.787 201.603 490.628 201.985 487.984 201.985Z" fill="#58E3EA"/><path d="M423.4 201.721V170.875H434.945C437.56 170.875 439.807 171.301 441.687 172.153C443.567 172.976 445.007 174.18 446.006 175.767C447.034 177.324 447.548 179.218 447.548 181.451C447.548 183.625 447.034 185.505 446.006 187.091C445.007 188.648 443.567 189.853 441.687 190.704C439.807 191.527 437.56 191.938 434.945 191.938H425.207L426.661 190.44V201.721H423.4ZM444.463 201.721L436.532 190.528H440.057L448.033 201.721H444.463ZM426.661 190.704L425.207 189.162H434.857C437.942 189.162 440.277 188.487 441.863 187.135C443.479 185.784 444.287 183.889 444.287 181.451C444.287 178.983 443.479 177.074 441.863 175.723C440.277 174.371 437.942 173.696 434.857 173.696H425.207L426.661 172.153V190.704Z" fill="#58E3EA"/><path d="M375.684 201.985C373.364 201.985 371.204 201.603 369.207 200.839C367.239 200.046 365.52 198.945 364.051 197.534C362.612 196.095 361.481 194.435 360.658 192.555C359.865 190.646 359.469 188.56 359.469 186.298C359.469 184.036 359.865 181.965 360.658 180.085C361.481 178.175 362.612 176.516 364.051 175.106C365.52 173.666 367.239 172.565 369.207 171.801C371.175 171.008 373.334 170.611 375.684 170.611C378.005 170.611 380.149 171.008 382.118 171.801C384.086 172.565 385.79 173.651 387.229 175.062C388.698 176.472 389.829 178.131 390.622 180.041C391.445 181.95 391.856 184.036 391.856 186.298C391.856 188.56 391.445 190.646 390.622 192.555C389.829 194.465 388.698 196.124 387.229 197.534C385.79 198.945 384.086 200.046 382.118 200.839C380.149 201.603 378.005 201.985 375.684 201.985ZM375.684 199.077C377.535 199.077 379.239 198.768 380.796 198.151C382.382 197.505 383.748 196.609 384.894 195.463C386.069 194.288 386.98 192.937 387.626 191.41C388.272 189.853 388.595 188.149 388.595 186.298C388.595 184.447 388.272 182.758 387.626 181.231C386.98 179.674 386.069 178.322 384.894 177.177C383.748 176.002 382.382 175.106 380.796 174.489C379.239 173.842 377.535 173.519 375.684 173.519C373.834 173.519 372.115 173.842 370.529 174.489C368.942 175.106 367.562 176.002 366.387 177.177C365.241 178.322 364.33 179.674 363.655 181.231C363.008 182.758 362.685 184.447 362.685 186.298C362.685 188.119 363.008 189.808 363.655 191.365C364.33 192.922 365.241 194.288 366.387 195.463C367.562 196.609 368.942 197.505 370.529 198.151C372.115 198.768 373.834 199.077 375.684 199.077Z" fill="#58E3EA"/><path d="M324.668 201.721V170.875H327.929V201.721H324.668Z" fill="#58E3EA"/><path d="M268.589 201.721V170.875H280.134C282.749 170.875 284.996 171.301 286.876 172.153C288.756 172.976 290.195 174.18 291.194 175.767C292.222 177.324 292.737 179.218 292.737 181.451C292.737 183.625 292.222 185.505 291.194 187.091C290.195 188.648 288.756 189.853 286.876 190.704C284.996 191.527 282.749 191.938 280.134 191.938H270.396L271.85 190.44V201.721H268.589ZM289.652 201.721L281.72 190.528H285.246L293.221 201.721H289.652ZM271.85 190.704L270.396 189.162H280.046C283.13 189.162 285.466 188.487 287.052 187.135C288.668 185.784 289.476 183.889 289.476 181.451C289.476 178.983 288.668 177.074 287.052 175.723C285.466 174.371 283.13 173.696 280.046 173.696H270.396L271.85 172.153V190.704Z" fill="#58E3EA"/><path d="M217.785 184.668H234.089V187.444H217.785V184.668ZM218.137 198.901H236.689V201.721H214.877V170.875H236.028V173.696H218.137V198.901Z" fill="#58E3EA"/><path d="M171.331 201.721V173.696H160.491V170.875H185.432V173.696H174.592V201.721H171.331Z" fill="#58E3EA"/><path d="M109.245 201.721L121.892 184.624V187.135L109.994 170.875H113.74L123.742 184.447L122.288 184.491L132.291 170.875H135.816L124.051 186.915V184.624L136.653 201.721H132.864L122.2 187.223H123.566L112.991 201.721H109.245Z" fill="#58E3EA"/><path d="M63.1027 184.668H79.4066V187.444H63.1027V184.668ZM63.4552 198.901H82.0064V201.721H60.1945V170.875H81.3455V173.696H63.4552V198.901Z" fill="#58E3EA"/></svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" class="active"><span class="nav-dot">▸</span>Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="btn-nav">Get Free Estimate</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-left">
+    <div class="hero-eyebrow fade-up">Minneapolis Exterior Specialists</div>
+    <h1 class="fade-up delay-1">Protecting Homes,<br><span>Exceeding</span><br>Expectations.</h1>
+    <p class="fade-up delay-2">At DOCO Exteriors, Kris and Jenna Donovan lead a team dedicated to delivering superior roofing, siding, windows, and gutters across the greater Minneapolis metro. Every project is personal.</p>
+    <div class="hero-actions fade-up delay-3">
+      <a href="#contact" class="btn-primary">
+        Get Free Estimate
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+      <a href="#services" class="btn-ghost">
+        Our Services
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-grid">
+      <div><img src="https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?w=900&q=80" alt="Roof installation"/></div>
+      <div><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=900&q=80" alt="Home exterior"/></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section-about" id="about">
+  <div class="about-img">
+    <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=900&q=80" alt="Minneapolis home exterior"/>
+  </div>
+  <div class="about-content">
+    <h2>Built on Trust,<br>Finished with Pride.</h2>
+    <p>DOCO Exteriors was founded by Kris and Jenna Donovan with one goal in mind: to give Minneapolis homeowners an exterior contractor they can genuinely trust. We see your home as more than a project — it's your biggest investment and where life happens.</p>
+    <p>With deep roots in the Twin Cities, our crews show up on time, communicate clearly, and leave every job site cleaner than they found it. From a full roof replacement to new windows and gutters, we bring the same level of care to every single home.</p>
+    <a href="#about" class="about-link">
+      More about us
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section class="section-numbers">
+  <h2>Our Numbers</h2>
+  <div class="numbers-grid">
+    <div class="number-card"><div class="num">15<span>+</span></div><div class="label">Years Serving<br>Minneapolis</div></div>
+    <div class="number-card"><div class="num">8</div><div class="label">Crew Members &amp;<br>Growing</div></div>
+    <div class="number-card"><div class="num">40<span>+</span></div><div class="label">Twin Cities<br>Communities Served</div></div>
+    <div class="number-card"><div class="num">600<span>+</span></div><div class="label">Projects<br>Completed</div></div>
+  </div>
+</section>
+
+<!-- SERVICES + PROCESS -->
+<section class="section-services" id="services">
+  <div class="services-header">
+    <h2>Our Services</h2>
+    <div class="services-nav">
+      <button class="svc-nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+      <button class="svc-nav-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80" alt="Roofing"/>
+      <div class="service-card-content">
+        <div class="service-tag">Roofing</div>
+        <h3>Roof Replacement &amp; Repair</h3>
+        <p>From storm damage to full replacements, we handle asphalt, metal, and architectural shingles with precision.</p>
+        <a href="#contact" class="service-card-link">Get a quote <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a>
+      </div>
+    </div>
+    <div class="service-card">
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Siding"/>
+      <div class="service-card-content">
+        <div class="service-tag">Siding</div>
+        <h3>Siding Installation</h3>
+        <p>Fiber cement, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.</p>
+        <a href="#contact" class="service-card-link">Get a quote <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a>
+      </div>
+    </div>
+    <div class="service-card">
+      <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&q=80" alt="Windows"/>
+      <div class="service-card-content">
+        <div class="service-tag">Windows</div>
+        <h3>Window Replacement</h3>
+        <p>Energy-efficient, Minnesota-rated windows installed to keep heat in and cold out — lowering your bills year-round.</p>
+        <a href="#contact" class="service-card-link">Get a quote <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a>
+      </div>
+    </div>
+    <div class="service-card">
+      <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80" alt="Gutters"/>
+      <div class="service-card-content">
+        <div class="service-tag">Gutters</div>
+        <h3>Gutter Systems</h3>
+        <p>Seamless gutters, guards, and downspout systems that protect your foundation through Minnesota's harshest seasons.</p>
+        <a href="#contact" class="service-card-link">Get a quote <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCESS -->
+  <div class="process-wrap" id="process">
+    <h2 style="padding-bottom: 60px;">Our Guided Process</h2>
+    <div class="process-body">
+      <div class="process-timeline">
+        <div class="process-step active" data-step="0"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">01</div><div class="step-title">Free Inspection</div></div></div>
+        <div class="process-step" data-step="1"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">02</div><div class="step-title">Filing an Insurance Claim</div></div></div>
+        <div class="process-step" data-step="2"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">03</div><div class="step-title">Scope Agreement</div></div></div>
+        <div class="process-step" data-step="3"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">04</div><div class="step-title">Design Meeting</div></div></div>
+        <div class="process-step" data-step="4"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">05</div><div class="step-title">Project Scheduling</div></div></div>
+        <div class="process-step" data-step="5"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">06</div><div class="step-title">Project Scheduled</div></div></div>
+        <div class="process-step" data-step="6"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">07</div><div class="step-title">Build Day</div></div></div>
+        <div class="process-step" data-step="7"><div class="step-connector"><div class="step-dot"></div><div class="step-line"></div></div><div class="step-label"><div class="step-num">08</div><div class="step-title">Project Completion</div></div></div>
+      </div>
+      <div class="process-panels">
+        <div class="process-panel active" data-panel="0">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 01 of 08</div><h3>Free Inspection</h3><p>Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work.</p></div>
+        </div>
+        <div class="process-panel" data-panel="1">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 02 of 08</div><h3>Filing an Insurance Claim</h3><p>If the damage may qualify for insurance coverage, the next step is filing a claim with your insurance company. Your Project Manager will provide the documentation and scope information necessary to support your claim and help guide you through the process.</p></div>
+        </div>
+        <div class="process-panel" data-panel="2">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 03 of 08</div><h3>Scope Agreement</h3><p>In many cases, your Project Manager will meet with your insurance company's representative onsite to review the damage and confirm the scope of work. Once the insurance company has completed their review, we will meet with you to walk through the final approved scope of the project.</p></div>
+        </div>
+        <div class="process-panel" data-panel="3">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 04 of 08</div><h3>Design Meeting</h3><p>Before construction begins, we will hold a design meeting to finalize the details of your project. During this meeting, we will confirm product selections, review construction plans, and address any special considerations or requests you may have for your build day.</p></div>
+        </div>
+        <div class="process-panel" data-panel="4">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 05 of 08</div><h3>Project Scheduling</h3><p>Once selections are finalized, our team will place orders with our suppliers and coordinate with our construction crews. Within approximately 72 hours of your design meeting, we will confirm product availability and provide you with an estimated timeline for your project.</p></div>
+        </div>
+        <div class="process-panel" data-panel="5">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 06 of 08</div><h3>Project Scheduled</h3><p>When materials are ready and scheduling is finalized, our team will contact you to confirm your construction dates. Materials will typically be delivered to your driveway prior to the start of construction, and we will confirm the expected start and completion dates with you.</p></div>
+        </div>
+        <div class="process-panel" data-panel="6">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 07 of 08</div><h3>Build Day</h3><p>Construction day can be busy, loud, and exciting as your home transformation begins. Your Project Manager will provide a preparation guide beforehand to help minimize inconvenience for you and your family. Once construction is complete, we will perform a final quality walkthrough with you to ensure you are satisfied with the workmanship and that your property is left clean and orderly.</p></div>
+        </div>
+        <div class="process-panel" data-panel="7">
+          <div class="panel-visual"><div class="panel-visual-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Animation<br>Area</span></div></div>
+          <div class="panel-text"><div class="panel-step-tag">Step 08 of 08</div><h3>Project Completion</h3><p>With construction complete, you can enjoy the improved look, protection, and value of your home. You will receive a final paid-in-full invoice for your records, along with any applicable warranty documentation.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-cta" id="contact">
+  <div class="cta-left">
+    <h2>Ready for a<br><span>Free Estimate?</span></h2>
+    <p>Kris and Jenna personally review every request. We'll get back to you within one business day with a straightforward, no-pressure estimate.</p>
+  </div>
+  <div class="cta-right">
+    <div class="cta-form">
+      <div class="form-row">
+        <input type="text" placeholder="First name"/>
+        <input type="text" placeholder="Last name"/>
+      </div>
+      <input type="email" placeholder="Email address"/>
+      <input type="tel" placeholder="Phone number"/>
+      <input type="text" placeholder="City / neighborhood (e.g. Edina, Plymouth)"/>
+      <select><option value="" disabled selected>What service are you interested in?</option><option>Roofing</option><option>Siding</option><option>Windows</option><option>Gutters</option><option>Multiple Services</option></select>
+      <textarea placeholder="Tell us a bit about your project..."></textarea>
+      <button class="btn-submit" type="button">Send My Request <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <svg width="568" height="349" viewBox="0 0 568 349" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:56px;width:auto;display:block;"><path d="M496.773 283.581C486.583 283.581 477.093 281.862 468.304 278.423C459.643 274.984 452.127 270.207 445.759 264.093C439.39 257.851 434.422 250.591 430.855 242.311C427.289 234.032 425.506 224.988 425.506 215.18C425.506 205.372 427.289 196.329 430.855 188.049C434.422 179.77 439.39 172.573 445.759 166.459C452.127 160.217 459.643 155.377 468.304 151.938C476.966 148.499 486.455 146.779 496.773 146.779C506.963 146.779 516.325 148.499 524.859 151.938C533.521 155.25 541.036 160.026 547.405 166.268C553.901 172.382 558.869 179.579 562.308 187.858C565.875 196.138 567.658 205.245 567.658 215.18C567.658 225.116 565.875 234.223 562.308 242.503C558.869 250.782 553.901 258.042 547.405 264.284C541.036 270.398 533.521 275.175 524.859 278.614C516.325 281.926 506.963 283.581 496.773 283.581ZM496.773 266.577C504.161 266.577 510.975 265.303 517.217 262.755C523.586 260.208 529.063 256.641 533.648 252.056C538.361 247.343 541.991 241.866 544.539 235.624C547.214 229.383 548.551 222.568 548.551 215.18C548.551 207.792 547.214 200.978 544.539 194.736C541.991 188.495 538.361 183.081 533.648 178.496C529.063 173.783 523.586 170.153 517.217 167.605C510.975 165.058 504.161 163.784 496.773 163.784C489.258 163.784 482.316 165.058 475.947 167.605C469.705 170.153 464.228 173.783 459.515 178.496C454.802 183.081 451.108 188.495 448.433 194.736C445.886 200.978 444.612 207.792 444.612 215.18C444.612 222.568 445.886 229.383 448.433 235.624C451.108 241.866 454.802 247.343 459.515 252.056C464.228 256.641 469.705 260.208 475.947 262.755C482.316 265.303 489.258 266.577 496.773 266.577Z" fill="white"/><path d="M366.656 283.581C356.466 283.581 347.04 281.926 338.379 278.614C329.844 275.175 322.393 270.398 316.024 264.284C309.783 258.042 304.879 250.782 301.312 242.503C297.746 234.223 295.962 225.116 295.962 215.18C295.962 205.245 297.746 196.138 301.312 187.858C304.879 179.579 309.846 172.382 316.215 166.268C322.584 160.026 330.036 155.25 338.57 151.938C347.231 148.499 356.657 146.779 366.847 146.779C377.165 146.779 386.654 148.562 395.316 152.129C404.105 155.568 411.556 160.727 417.671 167.605L405.251 179.642C400.156 174.292 394.424 170.344 388.055 167.796C381.687 165.121 374.872 163.784 367.612 163.784C360.096 163.784 353.091 165.058 346.594 167.605C340.226 170.153 334.685 173.719 329.972 178.305C325.259 182.89 321.565 188.368 318.89 194.736C316.343 200.978 315.069 207.792 315.069 215.18C315.069 222.568 316.343 229.446 318.89 235.815C321.565 242.057 325.259 247.47 329.972 252.056C334.685 256.641 340.226 260.208 346.594 262.755C353.091 265.303 360.096 266.577 367.612 266.577C374.872 266.577 381.687 265.303 388.055 262.755C394.424 260.08 400.156 256.004 405.251 250.527L417.671 262.564C411.556 269.443 404.105 274.665 395.316 278.232C386.654 281.798 377.101 283.581 366.656 283.581Z" fill="white"/><path d="M212.497 283.581C202.307 283.581 192.817 281.862 184.028 278.423C175.367 274.984 167.851 270.207 161.483 264.093C155.114 257.851 150.146 250.591 146.58 242.311C143.013 234.032 141.23 224.988 141.23 215.18C141.23 205.372 143.013 196.329 146.58 188.049C150.146 179.77 155.114 172.573 161.483 166.459C167.851 160.217 175.367 155.377 184.028 151.938C192.69 148.499 202.179 146.779 212.497 146.779C222.687 146.779 232.049 148.499 240.583 151.938C249.245 155.25 256.76 160.026 263.129 166.268C269.625 172.382 274.593 179.579 278.032 187.858C281.599 196.138 283.382 205.245 283.382 215.18C283.382 225.116 281.599 234.223 278.032 242.503C274.593 250.782 269.625 258.042 263.129 264.284C256.76 270.398 249.245 275.175 240.583 278.614C232.049 281.926 222.687 283.581 212.497 283.581ZM212.497 266.577C219.885 266.577 226.699 265.303 232.941 262.755C239.31 260.208 244.787 256.641 249.372 252.056C254.085 247.343 257.716 241.866 260.263 235.624C262.938 229.383 264.275 222.568 264.275 215.18C264.275 207.792 262.938 200.978 260.263 194.736C257.716 188.495 254.085 183.081 249.372 178.496C244.787 173.783 239.31 170.153 232.941 167.605C226.699 165.058 219.885 163.784 212.497 163.784C204.982 163.784 198.04 165.058 191.671 167.605C185.429 170.153 179.952 173.783 175.239 178.496C170.526 183.081 166.832 188.495 164.157 194.736C161.61 200.978 160.336 207.792 160.336 215.18C160.336 222.568 161.61 229.383 164.157 235.624C166.832 241.866 170.526 247.343 175.239 252.056C179.952 256.641 185.429 260.208 191.671 262.755C198.04 265.303 204.982 266.577 212.497 266.577Z" fill="white"/><path d="M3.05176e-05 282.053V148.308H56.3641C70.6303 148.308 83.1769 151.11 94.0039 156.714C104.958 162.319 113.429 170.153 119.415 180.215C125.53 190.278 128.587 201.933 128.587 215.18C128.587 228.427 125.53 240.082 119.415 250.145C113.429 260.208 104.958 268.042 94.0039 273.646C83.1769 279.251 70.6303 282.053 56.3641 282.053H3.05176e-05ZM19.1065 265.43H55.2177C66.2995 265.43 75.8527 263.329 83.8775 259.125C92.0296 254.922 98.3347 249.062 102.793 241.547C107.251 233.905 109.48 225.116 109.48 215.18C109.48 205.118 107.251 196.329 102.793 188.813C98.3347 181.298 92.0296 175.439 83.8775 171.235C75.8527 167.032 66.2995 164.93 55.2177 164.93H19.1065V265.43Z" fill="white"/><path d="M487.984 348.764C485.693 348.764 483.489 348.397 481.374 347.663C479.288 346.899 477.673 345.929 476.527 344.754L477.805 342.243C478.892 343.3 480.346 344.196 482.167 344.931C484.018 345.636 485.957 345.988 487.984 345.988C489.923 345.988 491.494 345.753 492.699 345.283C493.933 344.784 494.829 344.123 495.387 343.3C495.974 342.478 496.268 341.567 496.268 340.568C496.268 339.364 495.916 338.394 495.21 337.66C494.535 336.925 493.639 336.353 492.523 335.941C491.406 335.501 490.172 335.119 488.821 334.796C487.47 334.473 486.118 334.135 484.767 333.782C483.416 333.4 482.167 332.901 481.022 332.284C479.905 331.667 478.995 330.859 478.29 329.86C477.614 328.832 477.276 327.496 477.276 325.851C477.276 324.323 477.673 322.928 478.466 321.664C479.288 320.372 480.537 319.344 482.211 318.58C483.886 317.787 486.03 317.39 488.645 317.39C490.378 317.39 492.097 317.64 493.8 318.139C495.504 318.609 496.973 319.27 498.207 320.122L497.105 322.722C495.783 321.841 494.373 321.194 492.875 320.783C491.406 320.372 489.981 320.166 488.601 320.166C486.75 320.166 485.222 320.416 484.018 320.915C482.814 321.415 481.918 322.09 481.33 322.942C480.772 323.765 480.493 324.705 480.493 325.762C480.493 326.967 480.831 327.936 481.506 328.671C482.211 329.405 483.122 329.978 484.238 330.389C485.384 330.8 486.633 331.168 487.984 331.491C489.335 331.814 490.672 332.166 491.994 332.548C493.345 332.93 494.579 333.43 495.695 334.047C496.841 334.634 497.752 335.427 498.427 336.426C499.132 337.425 499.485 338.732 499.485 340.348C499.485 341.846 499.073 343.241 498.251 344.534C497.428 345.797 496.165 346.825 494.461 347.618C492.787 348.382 490.628 348.764 487.984 348.764Z" fill="white"/><path d="M423.4 348.5V317.655H434.945C437.56 317.655 439.807 318.08 441.687 318.932C443.567 319.755 445.007 320.959 446.006 322.546C447.034 324.103 447.548 325.997 447.548 328.23C447.548 330.404 447.034 332.284 446.006 333.87C445.007 335.427 443.567 336.632 441.687 337.484C439.807 338.306 437.56 338.717 434.945 338.717H425.207L426.661 337.219V348.5H423.4ZM444.463 348.5L436.532 337.307H440.057L448.033 348.5H444.463ZM426.661 337.484L425.207 335.941H434.857C437.942 335.941 440.277 335.266 441.863 333.914C443.479 332.563 444.287 330.668 444.287 328.23C444.287 325.762 443.479 323.853 441.863 322.502C440.277 321.15 437.942 320.475 434.857 320.475H425.207L426.661 318.932V337.484Z" fill="white"/><path d="M375.684 348.764C373.364 348.764 371.204 348.382 369.207 347.618C367.239 346.825 365.52 345.724 364.051 344.314C362.612 342.874 361.481 341.214 360.658 339.334C359.865 337.425 359.468 335.339 359.468 333.077C359.468 330.815 359.865 328.744 360.658 326.864C361.481 324.955 362.612 323.295 364.051 321.885C365.52 320.445 367.239 319.344 369.207 318.58C371.175 317.787 373.334 317.39 375.684 317.39C378.005 317.39 380.149 317.787 382.118 318.58C384.086 319.344 385.79 320.431 387.229 321.841C388.698 323.251 389.829 324.91 390.622 326.82C391.445 328.729 391.856 330.815 391.856 333.077C391.856 335.339 391.445 337.425 390.622 339.334C389.829 341.244 388.698 342.904 387.229 344.314C385.79 345.724 384.086 346.825 382.118 347.618C380.149 348.382 378.005 348.764 375.684 348.764ZM375.684 345.856C377.535 345.856 379.239 345.547 380.796 344.931C382.382 344.284 383.748 343.388 384.894 342.243C386.069 341.068 386.979 339.716 387.626 338.189C388.272 336.632 388.595 334.928 388.595 333.077C388.595 331.226 388.272 329.537 387.626 328.01C386.979 326.453 386.069 325.101 384.894 323.956C383.748 322.781 382.382 321.885 380.796 321.268C379.239 320.622 377.535 320.298 375.684 320.298C373.834 320.298 372.115 320.622 370.529 321.268C368.942 321.885 367.562 322.781 366.387 323.956C365.241 325.101 364.33 326.453 363.655 328.01C363.008 329.537 362.685 331.226 362.685 333.077C362.685 334.898 363.008 336.588 363.655 338.145C364.33 339.702 365.241 341.068 366.387 342.243C367.562 343.388 368.942 344.284 370.529 344.931C372.115 345.547 373.834 345.856 375.684 345.856Z" fill="white"/><path d="M324.668 348.5V317.655H327.929V348.5H324.668Z" fill="white"/><path d="M268.589 348.5V317.655H280.134C282.748 317.655 284.996 318.08 286.876 318.932C288.756 319.755 290.195 320.959 291.194 322.546C292.222 324.103 292.736 325.997 292.736 328.23C292.736 330.404 292.222 332.284 291.194 333.87C290.195 335.427 288.756 336.632 286.876 337.484C284.996 338.306 282.748 338.717 280.134 338.717H270.396L271.85 337.219V348.5H268.589ZM289.652 348.5L281.72 337.307H285.245L293.221 348.5H289.652ZM271.85 337.484L270.396 335.941H280.046C283.13 335.941 285.466 335.266 287.052 333.914C288.668 332.563 289.476 330.668 289.476 328.23C289.476 325.762 288.668 323.853 287.052 322.502C285.466 321.15 283.13 320.475 280.046 320.475H270.396L271.85 318.932V337.484Z" fill="white"/><path d="M217.785 331.447H234.089V334.223H217.785V331.447ZM218.137 345.68H236.689V348.5H214.877V317.655H236.028V320.475H218.137V345.68Z" fill="white"/><path d="M171.331 348.5V320.475H160.491V317.655H185.432V320.475H174.592V348.5H171.331Z" fill="white"/><path d="M109.245 348.5L121.892 331.403V333.914L109.994 317.655H113.74L123.743 331.226L122.288 331.271L132.291 317.655H135.816L124.051 333.694V331.403L136.653 348.5H132.864L122.2 334.003H123.566L112.991 348.5H109.245Z" fill="white"/><path d="M63.1027 331.447H79.4066V334.223H63.1027V331.447ZM63.4553 345.68H82.0064V348.5H60.1945V317.655H81.3455V320.475H63.4553V345.68Z" fill="white"/><path d="M241.661 0.430399C242.782 -0.184083 244.159 -0.140981 245.244 0.561259L278.078 21.8152L310.913 0.561259L311.133 0.430399C312.255 -0.184145 313.631 -0.140983 314.716 0.561259L486.189 111.561C487.812 112.612 488.276 114.779 487.225 116.402C486.175 118.024 484.008 118.488 482.385 117.438L312.814 7.66868L284.518 25.9851L416.716 111.561C418.339 112.612 418.803 114.779 417.752 116.402C416.702 118.024 414.535 118.488 412.913 117.438L243.341 7.66868L73.771 117.438C72.1484 118.489 69.9807 118.025 68.9302 116.402C67.8798 114.779 68.3437 112.612 69.9663 111.561L241.44 0.561259L241.661 0.430399Z" fill="#58E3EA"/></svg>
+      <p>Minneapolis-based exterior contractors you can count on. Kris &amp; Jenna Donovan, owners.</p>
+      <div class="footer-social">
+        <div class="social-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+        <div class="social-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+        <div class="social-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul><li><a href="#services">Roofing</a></li><li><a href="#services">Siding</a></li><li><a href="#services">Windows</a></li><li><a href="#services">Gutters</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul><li><a href="#about">About Us</a></li><li><a href="#process">Our Process</a></li><li><a href="#contact">Contact</a></li><li><a href="#">Reviews</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul><li><a href="tel:+16515550100">(651) 555-0100</a></li><li><a href="/cdn-cgi/l/email-protection#6d05080101022d09020e02081519081f04021f1e430e0200"><span class="__cf_email__" data-cfemail="85ede0e9e9eac5e1eae6eae0fdf1e0f7eceaf7f6abe6eae8">[email&#160;protected]</span></a></li><li><a href="#">Minneapolis, MN</a></li><li><a href="#">Licensed &amp; Insured</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 DOCO Exteriors. All rights reserved. Owned by <a href="#">Kris &amp; Jenna Donovan</a>.</p>
+    <p><a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms of Service</a></p>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  (function() {
+    const steps = document.querySelectorAll('.process-step');
+    const panels = document.querySelectorAll('.process-panel');
+    steps.forEach(step => {
+      step.addEventListener('click', () => {
+        const idx = parseInt(step.dataset.step);
+        steps.forEach(s => s.classList.remove('active'))
