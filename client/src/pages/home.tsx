@@ -6,6 +6,8 @@ import { GuidedProcess, CTASection, SiteFooter } from "@/components/shared-secti
 
 import says_it_all from "@assets/says-it-all.jpg";
 
+import kris_and_jenna from "@assets/kris-and-jenna.jpg";
+
 const SERVICE_LINKS: Record<string, string> = {
   Roofing: "/services/roofing",
   Siding: "/services/siding",
@@ -132,7 +134,7 @@ export default function Home() {
       <section id="about" className="bg-[#F5F4F0] text-[#0A0A0A] grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
         <div className="overflow-hidden">
           <img
-            src={says_it_all}
+            src={kris_and_jenna}
             alt="Minneapolis home exterior"
             className="w-full h-full object-cover block min-h-[400px] -scale-x-100"
           />
