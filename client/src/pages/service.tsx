@@ -20,7 +20,7 @@ const SERVICES: Record<string, ServiceData> = {
     slug: "roofing",
     title: "Roofing",
     headline: "Expert Roof Replacement & Repair",
-    heroImage: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=80",
+    heroImage: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png",
     description: "Your roof is your home's first line of defense against Minnesota's harsh weather. From storm damage repairs to complete replacements, DOCO Exteriors delivers professional roofing solutions that protect your family and investment for decades to come.",
     features: [
       { title: "Full Roof Replacement", desc: "Complete tear-off and installation with premium materials rated for Minnesota's climate. We ensure proper ventilation, ice and water shield, and industry-leading underlayment systems." },
@@ -42,7 +42,7 @@ const SERVICES: Record<string, ServiceData> = {
     slug: "siding",
     title: "Siding",
     headline: "Premium Siding Installation & Replacement",
-    heroImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+    heroImage: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png",
     description: "New siding transforms your home's appearance while providing critical protection against moisture, wind, and temperature extremes. DOCO Exteriors installs top-tier siding products that combine beauty, durability, and energy efficiency.",
     features: [
       { title: "Fiber Cement Siding", desc: "The gold standard in exterior cladding. Fiber cement siding resists fire, moisture, pests, and rot while maintaining its beautiful appearance for decades with minimal maintenance." },
@@ -64,7 +64,7 @@ const SERVICES: Record<string, ServiceData> = {
     slug: "windows",
     title: "Windows",
     headline: "Energy-Efficient Window Replacement",
-    heroImage: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200&q=80",
+    heroImage: "https://cdn.midjourney.com/15c2b54f-384d-4719-9eab-116caf3f4bc9/0_0.png",
     description: "Old, drafty windows cost you money every month and compromise your home's comfort. DOCO Exteriors installs Minnesota-rated, energy-efficient windows that keep your home comfortable year-round while reducing your energy bills.",
     features: [
       { title: "Double & Triple Pane", desc: "Advanced multi-pane glass with argon or krypton gas fill provides superior insulation, reducing heat transfer and keeping your home comfortable through Minnesota's temperature extremes." },
@@ -86,7 +86,7 @@ const SERVICES: Record<string, ServiceData> = {
     slug: "gutters",
     title: "Gutters",
     headline: "Seamless Gutter Systems & Protection",
-    heroImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80",
+    heroImage: "https://cdn.midjourney.com/10a24684-6aa4-4c97-8ad4-e6ce00a8fb6f/0_0.png",
     description: "Properly functioning gutters are essential to protecting your home's foundation, landscaping, and siding from water damage. DOCO Exteriors installs custom seamless gutter systems designed to handle Minnesota's heaviest rains and spring snowmelt.",
     features: [
       { title: "Seamless Gutters", desc: "Custom-fabricated on-site to fit your home perfectly, seamless gutters eliminate joints and seams where leaks typically develop, providing reliable water management for years to come." },

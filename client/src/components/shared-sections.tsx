@@ -262,10 +262,10 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
 }
 
 const ALL_SERVICES = [
-  { tag: "Roofing", title: "Roof Replacement & Repair", desc: "From storm damage to full replacements, we handle asphalt, metal, and architectural shingles with precision.", img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80", slug: "roofing" },
-  { tag: "Siding", title: "Siding Installation", desc: "Fiber cement, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.", img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80", slug: "siding" },
-  { tag: "Windows", title: "Window Replacement", desc: "Energy-efficient, Minnesota-rated windows installed to keep heat in and cold out — lowering your bills year-round.", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&q=80", slug: "windows" },
-  { tag: "Gutters", title: "Gutter Systems", desc: "Seamless gutters, guards, and downspout systems that protect your foundation through Minnesota's harshest seasons.", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80", slug: "gutters" },
+  { tag: "Roofing", title: "Roof Replacement & Repair", desc: "From storm damage to full replacements, we handle asphalt, metal, and architectural shingles with precision.", img: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png", slug: "roofing" },
+  { tag: "Siding", title: "Siding Installation", desc: "Fiber cement, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.", img: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png", slug: "siding" },
+  { tag: "Windows", title: "Window Replacement", desc: "Energy-efficient, Minnesota-rated windows installed to keep heat in and cold out — lowering your bills year-round.", img: "https://cdn.midjourney.com/15c2b54f-384d-4719-9eab-116caf3f4bc9/0_0.png", slug: "windows" },
+  { tag: "Gutters", title: "Gutter Systems", desc: "Seamless gutters, guards, and downspout systems that protect your foundation through Minnesota's harshest seasons.", img: "https://cdn.midjourney.com/10a24684-6aa4-4c97-8ad4-e6ce00a8fb6f/0_0.png", slug: "gutters" },
 ];
 
 export function OtherServicesSection({ currentSlug }: { currentSlug: string }) {
