@@ -54,7 +54,6 @@ export default function Home() {
           Get Free Estimate
         </button>
       </nav>
-
       {/* HERO */}
       <section id="home" className="min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-[68px] bg-[#0A0A0A]">
         <div className="flex flex-col justify-center px-8 md:px-16 lg:px-20 py-20">
@@ -119,7 +118,7 @@ export default function Home() {
             </div>
             <div className="overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=900&q=80"
+                src="https://cdn.midjourney.com/2648b2be-29ad-430f-9d89-c317e55e7505/0_0.png"
                 alt="Home exterior"
                 className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-[6s]"
               />
@@ -127,7 +126,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* ABOUT */}
       <section id="about" className="bg-[#F5F4F0] text-[#0A0A0A] grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
         <div className="overflow-hidden">
@@ -157,7 +155,6 @@ export default function Home() {
           </button>
         </div>
       </section>
-
       {/* NUMBERS */}
       <section className="bg-[#F5F4F0] px-8 md:px-20 pt-20 pb-24" style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
         <h2 className="text-[clamp(28px,3vw,40px)] font-extrabold text-[#0A0A0A] tracking-tight mb-12" data-testid="text-numbers-headline">Our Numbers</h2>
@@ -179,7 +176,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
       {/* SERVICES */}
       <section id="services" className="bg-[#111111] px-8 md:px-20 pt-24 pb-0">
         <div className="flex items-end justify-between mb-14">
@@ -222,7 +218,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
       <GuidedProcess />
       <CTASection />
       <SiteFooter />
