@@ -136,7 +136,7 @@ export default function Home() {
           <img
             src={kris_and_jenna}
             alt="Minneapolis home exterior"
-            className="w-full h-full object-cover block min-h-[400px] -scale-x-100"
+            className="w-full h-full object-cover block min-h-[400px]"
           />
         </div>
         <div className="p-12 md:p-16 lg:py-24 lg:px-[72px] flex flex-col justify-center">
