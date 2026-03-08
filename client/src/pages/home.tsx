@@ -111,7 +111,7 @@ export default function Home() {
           <div className="grid grid-rows-2 h-full">
             <div className="overflow-hidden" style={{ borderBottom: "3px solid #0A0A0A" }}>
               <img
-                src="https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?w=900&q=80"
+                src="https://cdn.midjourney.com/f6ba9c4b-190e-4ae5-a869-b19bcb4df4ba/0_0.png"
                 alt="Roof installation"
                 className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-[6s]"
               />
