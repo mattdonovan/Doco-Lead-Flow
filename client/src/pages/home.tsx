@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { GuidedProcess, CTASection, SiteFooter } from "@/components/shared-sections";
 
+import says_it_all from "@assets/says-it-all.jpg";
+
 const SERVICE_LINKS: Record<string, string> = {
   Roofing: "/services/roofing",
   Siding: "/services/siding",
@@ -130,7 +132,7 @@ export default function Home() {
       <section id="about" className="bg-[#F5F4F0] text-[#0A0A0A] grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
         <div className="overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=900&q=80"
+            src={says_it_all}
             alt="Minneapolis home exterior"
             className="w-full h-full object-cover block min-h-[400px]"
           />
