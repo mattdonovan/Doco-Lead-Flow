@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Phone, Mail, MapPin, Shield } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText } from "lucide-react";
 
 const PROCESS_STEPS = [
   { num: "01", title: "Free Inspection", desc: "Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work." },
@@ -182,17 +182,15 @@ export function SiteFooter() {
           <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#58E3EA] mb-5">Company</h4>
           <ul className="flex flex-col gap-3">
             <li><button onClick={() => navigate("/about")} className="text-[13px] text-white/55 hover:text-white transition-colors">About Us</button></li>
-            <li><button onClick={() => navigate("/")} className="text-[13px] text-white/55 hover:text-white transition-colors">Our Process</button></li>
             <li><button onClick={() => navigate("/estimate")} className="text-[13px] text-white/55 hover:text-white transition-colors">Contact</button></li>
-            <li><a href="#" className="text-[13px] text-white/55 hover:text-white transition-colors">Reviews</a></li>
           </ul>
         </div>
         <div>
           <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#58E3EA] mb-5">Contact</h4>
           <ul className="flex flex-col gap-3">
-            <li><a href="tel:+16515550100" className="text-[13px] text-white/55 hover:text-white transition-colors flex items-center gap-2"><Phone size={12} /> (651) 555-0100</a></li>
             <li><a href="mailto:hello@docoexteriors.com" className="text-[13px] text-white/55 hover:text-white transition-colors flex items-center gap-2"><Mail size={12} /> hello@docoexteriors.com</a></li>
             <li><span className="text-[13px] text-white/55 flex items-center gap-2"><MapPin size={12} /> Minneapolis, MN</span></li>
+            <li><a href="/Reg_cert_1773018901213.pdf" target="_blank" rel="noopener noreferrer" className="text-[13px] text-white/55 hover:text-white transition-colors flex items-center gap-2"><FileText size={12} /> GC Registration Certificate</a></li>
             <li><span className="text-[13px] text-white/55 flex items-center gap-2"><Shield size={12} /> Licensed & Insured</span></li>
           </ul>
         </div>
@@ -218,20 +216,19 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 h-[68px] bg-[#0A0A0A]/95 backdrop-blur-xl"
       style={{ borderBottom: "1px solid rgba(88,227,234,0.12)" }}
     >
-      <div className="flex items-center gap-4">
-        <button onClick={() => navigate("/")} className="flex items-center transition-transform duration-200 hover:scale-110 focus:scale-110 focus:outline-none" data-testid="link-home-logo">
-          <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
-        </button>
+      <div className="flex items-center gap-2">
         {variant === "subpage" && (
           <button
             onClick={() => navigate("/")}
-            className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors flex items-center gap-1.5"
+            className="text-white/70 hover:text-[#58E3EA] transition-colors flex items-center"
             data-testid="link-nav-back-home"
           >
             <ArrowRight size={14} strokeWidth={2.5} className="rotate-180" />
-            Home
           </button>
         )}
+        <button onClick={() => navigate("/")} className="flex items-center transition-transform duration-200 hover:scale-110 focus:scale-110 focus:outline-none" data-testid="link-home-logo">
+          <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
+        </button>
       </div>
       {variant === "subpage" ? (
         <button

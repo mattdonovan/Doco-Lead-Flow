@@ -159,27 +159,6 @@ export default function Home() {
           </button>
         </div>
       </section>
-      {/* NUMBERS */}
-      <section className="bg-[#F5F4F0] px-8 md:px-20 pt-20 pb-24" style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
-        <h2 className="text-[clamp(28px,3vw,40px)] font-extrabold text-[#0A0A0A] tracking-tight mb-12" data-testid="text-numbers-headline">Our Numbers</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          {[
-            { num: "15", suffix: "+", label: "Years Serving\nMinneapolis" },
-            { num: "8", suffix: "", label: "Crew Members &\nGrowing" },
-            { num: "40", suffix: "+", label: "Twin Cities\nCommunities Served" },
-            { num: "600", suffix: "+", label: "Projects\nCompleted" },
-          ].map((item, i) => (
-            <div key={i} className="bg-white p-8 md:p-10 rounded shadow-sm" data-testid={`card-number-${i}`}>
-              <div className="text-[52px] font-black text-[#0A0A0A] tracking-tighter leading-none mb-3">
-                {item.num}<span className="text-[#3ABFC6]">{item.suffix}</span>
-              </div>
-              <div className="text-[12px] font-semibold tracking-wider uppercase text-[#888] leading-snug whitespace-pre-line">
-                {item.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
       {/* SERVICES */}
       <section id="services" className="bg-[#111111] px-8 md:px-20 pt-24 pb-0">
         <div className="flex items-end justify-between mb-14">

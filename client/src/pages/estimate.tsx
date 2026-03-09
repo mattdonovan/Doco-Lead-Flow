@@ -380,8 +380,8 @@ export default function EstimatePage() {
         </div>
         <div className="p-6 border-t border-white/[0.06]">
           <p className="text-[11px] text-white/30 leading-relaxed">
-            Questions? Call us at<br />
-            <a href="tel:+16515550100" className="text-[#58E3EA] hover:underline">(651) 555-0100</a>
+            Questions?<br />
+            <a href="mailto:hello@docoexteriors.com" className="text-[#58E3EA] hover:underline">hello@docoexteriors.com</a>
           </p>
         </div>
       </div>
