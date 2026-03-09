@@ -20,8 +20,8 @@ Lead-gen website for DOCO Exteriors, a Minneapolis exterior contractor owned by 
 - `client/src/pages/about.tsx` — About Us page (founder letter, core values)
 - `client/src/pages/service.tsx` — Individual service pages (Roofing, Siding, Windows, Gutters)
 - `client/src/pages/estimate.tsx` — Multi-step conversational quote request form
-- `client/src/components/shared-sections.tsx` — Shared sections: SiteNav, GuidedProcess, CTASection, SiteFooter
-- `server/routes.ts` — API routes (POST/GET /api/quotes + email sending)
+- `client/src/components/shared-sections.tsx` — Shared sections: SiteNav, GuidedProcess, CTASection, SiteFooter, OtherServicesSection
+- `server/routes.ts` — API routes (POST/GET /api/quotes, POST /api/notify + email sending)
 - `server/storage.ts` — Database CRUD via Drizzle
 - `shared/schema.ts` — Database schema + Zod validation
 
@@ -31,9 +31,31 @@ Lead-gen website for DOCO Exteriors, a Minneapolis exterior contractor owned by 
 - `/services/:slug` — Service pages (roofing, siding, windows, gutters)
 - `/estimate` — Quote request form
 
+## Estimate Form Steps
+1. **City** — Type-ahead autocomplete. Service area cities proceed directly. Surrounding area cities show expansion prompt with "Continue anyway" or "Notify me" options.
+2. **Property Type** — Single Family, Townhouse, Multi-Family, Commercial
+3. **Services** — Image-based cards (Roofing, Siding, Windows, Gutters) using Midjourney images
+4. **Details** — Insurance (yes/no), Timeline, Service offerings grid (select-all option), Additional details textarea
+5. **Review** — Cart-style summary of all selections + contact info form (first/last name, email required, phone optional with auto-formatting)
+
+## Service Area Cities
+Albertville, Andover, Anoka, Becker, Big Lake, Blaine, Brooklyn Center, Brooklyn Park, Buffalo, Champlin, Coon Rapids, Crystal, Dayton, Delano, Elk River, Golden Valley, Hamel, Howard Lake, Loretto, Maple Grove, Medina, Monticello, New Hope, Osseo, Otsego, Plymouth, Ramsey, Robbinsdale, Rogers, St. Michael, Watertown, Waverly
+
+## Surrounding Area Cities (Expanding Soon)
+Afton, Apple Valley, Bayport, Belle Plaine, Bloomington, Burnsville, Cambridge, Cannon Falls, Carver, Chanhassen, Chaska, Cottage Grove, East Bethel, Eagan, Eden Prairie, Edina, Excelsior, Farmington, Forest Lake, Fridley, Hopkins, Hugo, Lake Elmo, Lakeville, Lino Lakes, Mahtomedi, Maplewood, Minnetonka, Mound, Newport, North Branch, Northfield, Oak Park Heights, Oakdale, Prior Lake, Richfield, Rosemount, Roseville, Savage, Shakopee, Shorewood, Spring Lake Park, St. Louis Park, St. Paul, Stacy, Stillwater, Victoria, Waconia, Wayzata, White Bear Lake, Woodbury, Wyoming
+
+## Service Images (Midjourney)
+- Roofing: https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png
+- Siding: https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png
+- Windows: https://cdn.midjourney.com/15c2b54f-384d-4719-9eab-116caf3f4bc9/0_0.png
+- Gutters: https://cdn.midjourney.com/10a24684-6aa4-4c97-8ad4-e6ce00a8fb6f/0_0.png
+
+## DOCO Avatar
+3x3 grid of small squares with pulsing opacity animation (replacing the old "D" circle). Uses cyan gradient background.
+
 ## Shared Sections (on all pages)
 - Our Guided Process (interactive 8-step timeline)
-- Ready for a Free Estimate? (CTA)
+- Ready for a Free Estimate? (CTA with animated background)
 - Footer
 
 ## Logo Assets
@@ -45,7 +67,14 @@ Uses Resend API for transactional emails:
 - `RESEND_API_KEY` — Resend API key (configured)
 - Sends from: `onboarding@resend.dev` (Resend default sender)
 - Once a custom domain is verified in Resend, update the `from` address in `server/routes.ts`
+- All user input is HTML-escaped before embedding in email templates
+
+## API Endpoints
+- `POST /api/quotes` — Submit quote request (validated with Zod)
+- `GET /api/quotes` — List all quote requests
+- `POST /api/notify` — Submit expansion interest notification (email + city, validated with Zod)
 
 ## Database
 - PostgreSQL with `quoteRequests` table for form submissions
 - Schema managed via Drizzle ORM
+- Fields: firstName, lastName, email, phone (nullable), address (nullable), city, services[], propertyType, projectTimeline, additionalDetails, hasInsuranceClaim, selectedOfferings[] (nullable)

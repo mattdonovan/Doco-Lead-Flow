@@ -14,14 +14,15 @@ export const quoteRequests = pgTable("quote_requests", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email").notNull(),
-  phone: text("phone").notNull(),
-  address: text("address").notNull(),
+  phone: text("phone"),
+  address: text("address"),
   city: text("city").notNull(),
   services: text("services").array().notNull(),
   propertyType: text("property_type").notNull(),
   projectTimeline: text("project_timeline").notNull(),
   additionalDetails: text("additional_details"),
   hasInsuranceClaim: boolean("has_insurance_claim").default(false),
+  selectedOfferings: text("selected_offerings").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
