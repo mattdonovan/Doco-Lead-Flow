@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, Check, Home, Wrench, MessageSquare, ChevronLeft, MapPin, ClipboardList, Bell } from "lucide-react";
@@ -174,6 +174,7 @@ export default function EstimatePage() {
 
   const cityRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const offeringsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -629,7 +630,12 @@ export default function EstimatePage() {
                           return (
                             <button
                               key={tl.id}
-                              onClick={() => setFormData(prev => ({ ...prev, projectTimeline: tl.id }))}
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, projectTimeline: tl.id }));
+                                setTimeout(() => {
+                                  offeringsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                }, 100);
+                              }}
                               className={`flex items-center gap-4 px-5 py-3.5 rounded-lg border-2 transition-all text-left ${
                                 selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
                               }`}
@@ -647,8 +653,13 @@ export default function EstimatePage() {
                       </div>
                     </div>
 
-                    {formData.services.length > 0 && (
-                      <div>
+                    {formData.projectTimeline && formData.services.length > 0 && (
+                      <motion.div
+                        ref={offeringsRef}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35 }}
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <label className="text-[11px] font-bold tracking-wider uppercase text-white/40">What are you looking for?</label>
                           <button
@@ -666,28 +677,21 @@ export default function EstimatePage() {
                           return (
                             <div key={svcId} className="mb-4">
                               <p className="text-[12px] font-semibold text-white/60 mb-2 uppercase tracking-wide">{svc.label}</p>
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="flex flex-wrap gap-2">
                                 {offerings.map(offering => {
                                   const selected = formData.selectedOfferings.includes(offering);
                                   return (
                                     <button
                                       key={offering}
                                       onClick={() => toggleOffering(offering)}
-                                      className={`text-left px-3.5 py-3 rounded border transition-all text-[13px] font-medium ${
+                                      className={`text-[11px] font-medium px-2.5 py-1 rounded transition-all cursor-pointer ${
                                         selected
-                                          ? "border-[#58E3EA] bg-[#58E3EA]/[0.06] text-white"
-                                          : "border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20"
+                                          ? "text-[#58E3EA] bg-[#58E3EA]/10"
+                                          : "text-white/40 bg-white/[0.04] hover:text-white/60 hover:bg-white/[0.08]"
                                       }`}
                                       data-testid={`button-offering-${offering.toLowerCase().replace(/\s+/g, "-")}`}
                                     >
-                                      <div className="flex items-center gap-2">
-                                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
-                                          selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/20"
-                                        }`}>
-                                          {selected && <Check size={10} strokeWidth={3} className="text-[#0A0A0A]" />}
-                                        </div>
-                                        {offering}
-                                      </div>
+                                      {offering}
                                     </button>
                                   );
                                 })}
@@ -695,20 +699,20 @@ export default function EstimatePage() {
                             </div>
                           );
                         })}
-                      </div>
-                    )}
 
-                    <div>
-                      <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Other details (optional)</label>
-                      <textarea
-                        placeholder="Anything else we should know about your project?"
-                        value={formData.additionalDetails}
-                        onChange={(e) => setFormData(prev => ({ ...prev, additionalDetails: e.target.value }))}
-                        rows={3}
-                        className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03] resize-none"
-                        data-testid="input-additional-details"
-                      />
-                    </div>
+                        <div className="mt-6">
+                          <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Other details (optional)</label>
+                          <textarea
+                            placeholder="Anything else we should know about your project?"
+                            value={formData.additionalDetails}
+                            onChange={(e) => setFormData(prev => ({ ...prev, additionalDetails: e.target.value }))}
+                            rows={3}
+                            className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03] resize-none"
+                            data-testid="input-additional-details"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                 )}
 
