@@ -201,7 +201,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <div className="sm:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 -mx-8 px-8 scrollbar-hide" style={{ WebkitOverflowScrolling: "touch" }}>
+        <div className="sm:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 -mx-8 px-8 swipe-carousel">
           {[
             { tag: "Roofing", title: "Roof Replacement & Repair", desc: "From storm damage to full replacements, we handle asphalt, metal, and architectural shingles with precision.", img: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png" },
             { tag: "Siding", title: "Siding Installation", desc: "Steel, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.", img: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png" },

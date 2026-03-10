@@ -35,6 +35,41 @@ const ALL_CITIES = [
   ...SURROUNDING_AREA.map(c => ({ name: c, type: "surrounding" as const })),
 ].sort((a, b) => a.name.localeCompare(b.name));
 
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
+function fuzzyMatchCities(input: string): { exact: typeof ALL_CITIES; fuzzy: typeof ALL_CITIES } {
+  const q = input.trim().toLowerCase();
+  if (!q) return { exact: [], fuzzy: [] };
+  const exact = ALL_CITIES.filter(c => c.name.toLowerCase().startsWith(q));
+  if (exact.length > 0) return { exact, fuzzy: [] };
+  const threshold = Math.max(2, Math.floor(q.length * 0.4));
+  const scored = ALL_CITIES
+    .map(c => {
+      const name = c.name.toLowerCase();
+      const sub = name.slice(0, q.length);
+      const dist = levenshtein(q, sub);
+      const fullDist = levenshtein(q, name);
+      return { city: c, dist: Math.min(dist, fullDist) };
+    })
+    .filter(s => s.dist <= threshold)
+    .sort((a, b) => a.dist - b.dist)
+    .slice(0, 5);
+  return { exact: [], fuzzy: scored.map(s => s.city) };
+}
+
 const SERVICE_IMAGES: Record<string, string> = {
   roofing: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png",
   siding: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png",
@@ -207,9 +242,9 @@ export default function EstimatePage() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const filteredCities = cityInput.trim()
-    ? ALL_CITIES.filter(c => c.name.toLowerCase().startsWith(cityInput.toLowerCase()))
-    : [];
+  const cityMatches = fuzzyMatchCities(cityInput);
+  const filteredCities = cityMatches.exact;
+  const fuzzyCities = cityMatches.fuzzy;
 
   const selectCity = (city: { name: string; type: "service" | "surrounding" }) => {
     setCityInput(city.name);
@@ -739,7 +774,27 @@ export default function EstimatePage() {
                           ))}
                         </div>
                       )}
-                      {showSuggestions && cityInput.trim().length >= 2 && filteredCities.length === 0 && (
+                      {showSuggestions && cityInput.trim().length >= 2 && filteredCities.length === 0 && fuzzyCities.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-[#1A1A1A] border border-white/10 rounded z-50 overflow-hidden">
+                          <div className="px-4 pt-3 pb-1.5">
+                            <p className="text-xs text-white/40 font-medium" data-testid="text-did-you-mean">Did you mean?</p>
+                          </div>
+                          {fuzzyCities.map((city) => (
+                            <button
+                              key={city.name}
+                              onClick={() => selectCity(city)}
+                              className="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/[0.06] flex items-center justify-between transition-colors"
+                              data-testid={`city-option-fuzzy-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
+                            >
+                              <span>{city.name}, MN</span>
+                              {city.type === "surrounding" && (
+                                <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70">Expanding Soon</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {showSuggestions && cityInput.trim().length >= 2 && filteredCities.length === 0 && fuzzyCities.length === 0 && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-[#1A1A1A] border border-white/10 rounded p-4">
                           <p className="text-sm text-white/50">We don't currently serve this area. Try a different city in the Minneapolis metro.</p>
                         </div>

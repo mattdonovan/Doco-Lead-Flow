@@ -95,7 +95,7 @@ export function GuidedProcess() {
         </div>
       </div>
 
-      <div className="md:hidden flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-8 px-8 scrollbar-hide" style={{ WebkitOverflowScrolling: "touch" }}>
+      <div className="md:hidden flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-8 px-8 swipe-carousel">
         {PROCESS_STEPS.map((s, i) => (
           <div
             key={i}
