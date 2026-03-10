@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, Check, Home, Wrench, MessageSquare, ChevronLeft, MapPin, ClipboardList, Bell } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, Home, Wrench, ChevronLeft, MapPin, ClipboardList, Bell, ChevronDown, Upload, Camera, X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -49,13 +49,6 @@ const SERVICES = [
   { id: "gutters", label: "Gutters", desc: "Seamless Systems" },
 ];
 
-const SERVICE_OFFERINGS: Record<string, string[]> = {
-  roofing: ["Full Roof Replacement", "Storm Damage Repair", "Architectural Shingles", "Metal Roofing"],
-  siding: ["Fiber Cement Siding", "Vinyl Siding", "Engineered Wood Siding", "Soffit & Fascia"],
-  windows: ["Double & Triple Pane", "Custom Sizing & Styles", "Low-E Glass Coating", "Full Frame Replacement"],
-  gutters: ["Seamless Gutters", "Gutter Guards", "Downspout Systems", "Ice Dam Prevention"],
-};
-
 const PROPERTY_TYPES = [
   { id: "single-family", label: "Single Family Home" },
   { id: "townhouse", label: "Townhouse" },
@@ -65,18 +58,42 @@ const PROPERTY_TYPES = [
 
 const TIMELINES = [
   { id: "asap", label: "As soon as possible" },
-  { id: "1-3-months", label: "Within 1–3 months" },
-  { id: "3-6-months", label: "Within 3–6 months" },
+  { id: "1-3-months", label: "Within 1\u20133 months" },
+  { id: "3-6-months", label: "Within 3\u20136 months" },
   { id: "just-exploring", label: "Just exploring options" },
 ];
 
 const SIDEBAR_SECTIONS = [
   { label: "Location", icon: MapPin },
-  { label: "Property", icon: Home },
-  { label: "Services", icon: Wrench },
-  { label: "Details", icon: MessageSquare },
+  { label: "Project", icon: Home },
+  { label: "Details", icon: Wrench },
   { label: "Review", icon: ClipboardList },
 ];
+
+const SERVICE_QUESTIONS: Record<string, { q1: { question: string; options: string[] }; q2: { question: string; options: string[] } }> = {
+  roofing: {
+    q1: { question: "How old is your current roof?", options: ["Under 10 years", "10\u201320 years", "20+ years", "Don't know"] },
+    q2: { question: "What's the situation?", options: ["Active leak or water damage", "Missing or visibly damaged shingles", "Storm or hail damage", "Just aging \u2014 time for a replacement", "Not sure, need an inspection"] },
+  },
+  siding: {
+    q1: { question: "What's your current siding material?", options: ["Vinyl", "Wood", "Fiber cement", "Hardie", "Not sure"] },
+    q2: { question: "What's driving this project?", options: ["Visible damage or rot", "Storm damage", "Just outdated \u2014 ready for an upgrade", "Selling the home soon", "Not sure, need an opinion"] },
+  },
+  windows: {
+    q1: { question: "Roughly how many windows?", options: ["1 to 3", "4 to 8", "9 or more", "Full house \u2014 not sure on count"] },
+    q2: { question: "What's the main reason?", options: ["Drafty or poor insulation", "Condensation or fogging between panes", "Damaged / won't open or close", "Storm damage", "Just upgrading for curb appeal"] },
+  },
+  gutters: {
+    q1: { question: "What's the main issue?", options: ["Overflowing during rain", "Sagging or pulling away", "Visible damage or holes", "I don't have gutters yet", "Full replacement \u2014 they're just old"] },
+    q2: { question: "Do you have gutter guards?", options: ["Yes", "No", "Not sure"] },
+  },
+};
+
+const HOME_CONTEXT_CHIPS = {
+  "About the home": ["Just bought this home", "Getting ready to sell", "Previous work done here", "HOA approval may be needed"],
+  "About the job": ["Two stories or higher", "Steep roof pitch", "Detached garage to include", "Hard to access areas"],
+  "About you": ["I've gotten other estimates already", "I'd like to be home during the estimate", "I prefer communication by text", "I prefer communication by phone"],
+};
 
 function formatPhone(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 10);
@@ -134,10 +151,7 @@ interface FormData {
   services: string[];
   hasInsuranceClaim: boolean | null;
   projectTimeline: string;
-  selectedOfferings: string[];
-  additionalDetails: string;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   phone: string;
 }
@@ -147,6 +161,10 @@ export default function EstimatePage() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [quoteId, setQuoteId] = useState<string | null>(null);
+  const [showDetailFlow, setShowDetailFlow] = useState(false);
+  const [detailStep, setDetailStep] = useState(0);
+  const [detailsSubmitted, setDetailsSubmitted] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     city: "",
@@ -155,13 +173,15 @@ export default function EstimatePage() {
     services: [],
     hasInsuranceClaim: null,
     projectTimeline: "",
-    selectedOfferings: [],
-    additionalDetails: "",
-    firstName: "",
-    lastName: "",
+    fullName: "",
     email: "",
     phone: "",
   });
+
+  const [serviceAnswers, setServiceAnswers] = useState<Record<string, Record<string, string>>>({});
+  const [homeContext, setHomeContext] = useState<string[]>([]);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const [cityInput, setCityInput] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -171,10 +191,11 @@ export default function EstimatePage() {
   const [notifySubmitted, setNotifySubmitted] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
+  const [reviewExpanded, setReviewExpanded] = useState(false);
 
   const cityRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const offeringsRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -201,14 +222,37 @@ export default function EstimatePage() {
     }
   };
 
+  const parseName = (fullName: string) => {
+    const parts = fullName.trim().split(/\s+/);
+    const firstName = parts[0] || "";
+    const lastName = parts.slice(1).join(" ") || "";
+    return { firstName, lastName };
+  };
+
   const submitMutation = useMutation({
     mutationFn: async (data: InsertQuoteRequest) => {
       const res = await apiRequest("POST", "/api/quotes", data);
       return res.json();
     },
-    onSuccess: () => setSubmitted(true),
+    onSuccess: (data) => {
+      setQuoteId(data.id);
+      setSubmitted(true);
+    },
     onError: () => {
-      toast({ title: "Something went wrong", description: "Please try again or call us directly.", variant: "destructive" });
+      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    },
+  });
+
+  const detailMutation = useMutation({
+    mutationFn: async (data: { serviceDetails?: Record<string, Record<string, string>>; homeContext?: string[]; photoUrl?: string }) => {
+      const res = await apiRequest("PATCH", `/api/quotes/${quoteId}/details`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      setDetailsSubmitted(true);
+    },
+    onError: () => {
+      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
     },
   });
 
@@ -224,37 +268,10 @@ export default function EstimatePage() {
   });
 
   const toggleService = (id: string) => {
-    setFormData(prev => {
-      const next = prev.services.includes(id)
-        ? prev.services.filter(s => s !== id)
-        : [...prev.services, id];
-      const validOfferings = next.flatMap(s => SERVICE_OFFERINGS[s] || []);
-      return {
-        ...prev,
-        services: next,
-        selectedOfferings: prev.selectedOfferings.filter(o => validOfferings.includes(o)),
-      };
-    });
-  };
-
-  const allOfferings = formData.services.flatMap(s => SERVICE_OFFERINGS[s] || []);
-  const allOfferingsSelected = allOfferings.length > 0 && allOfferings.every(o => formData.selectedOfferings.includes(o));
-
-  const toggleOffering = (offering: string) => {
     setFormData(prev => ({
       ...prev,
-      selectedOfferings: prev.selectedOfferings.includes(offering)
-        ? prev.selectedOfferings.filter(o => o !== offering)
-        : [...prev.selectedOfferings, offering],
+      services: prev.services.includes(id) ? prev.services.filter(s => s !== id) : [...prev.services, id],
     }));
-  };
-
-  const toggleAllOfferings = () => {
-    if (allOfferingsSelected) {
-      setFormData(prev => ({ ...prev, selectedOfferings: [] }));
-    } else {
-      setFormData(prev => ({ ...prev, selectedOfferings: [...allOfferings] }));
-    }
   };
 
   const canProceed = (): boolean => {
@@ -262,15 +279,12 @@ export default function EstimatePage() {
       case 0:
         return formData.city !== "" && formData.cityType !== null && !surroundingPrompt;
       case 1:
-        return formData.propertyType !== "";
+        return formData.propertyType !== "" && formData.services.length > 0;
       case 2:
-        return formData.services.length > 0;
-      case 3:
         return formData.projectTimeline !== "";
-      case 4:
+      case 3:
         return (
-          formData.firstName.trim() !== "" &&
-          formData.lastName.trim() !== "" &&
+          formData.fullName.trim().split(/\s+/).length >= 2 &&
           isValidEmail(formData.email) &&
           isValidPhone(formData.phone)
         );
@@ -281,7 +295,7 @@ export default function EstimatePage() {
 
   const goNext = () => {
     if (!canProceed()) return;
-    if (step === 4) {
+    if (step === 3) {
       handleSubmit();
       return;
     }
@@ -293,9 +307,10 @@ export default function EstimatePage() {
   };
 
   const handleSubmit = () => {
+    const { firstName, lastName } = parseName(formData.fullName);
     const data: InsertQuoteRequest = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      firstName,
+      lastName,
       email: formData.email,
       phone: formData.phone || null,
       address: null,
@@ -303,24 +318,284 @@ export default function EstimatePage() {
       services: formData.services,
       propertyType: formData.propertyType,
       projectTimeline: formData.projectTimeline,
-      additionalDetails: formData.additionalDetails || null,
+      additionalDetails: null,
       hasInsuranceClaim: formData.hasInsuranceClaim ?? false,
-      selectedOfferings: formData.selectedOfferings.length > 0 ? formData.selectedOfferings : null,
+      selectedOfferings: null,
     };
     submitMutation.mutate(data);
   };
 
+  const activeServiceKeys = formData.services.filter(s => SERVICE_QUESTIONS[s]);
+  const totalDetailSteps = activeServiceKeys.length + 2;
+
+  const handleDetailNext = () => {
+    if (detailStep < totalDetailSteps - 1) {
+      setDetailStep(prev => prev + 1);
+    } else {
+      detailMutation.mutate({
+        serviceDetails: serviceAnswers,
+        homeContext: homeContext.length > 0 ? homeContext : undefined,
+        photoUrl: photoPreview || undefined,
+      });
+    }
+  };
+
+  const handleDetailBack = () => {
+    if (detailStep > 0) setDetailStep(prev => prev - 1);
+  };
+
+  const setAnswer = (service: string, question: string, answer: string) => {
+    setServiceAnswers(prev => ({
+      ...prev,
+      [service]: { ...(prev[service] || {}), [question]: answer },
+    }));
+  };
+
+  const toggleContext = (chip: string) => {
+    setHomeContext(prev => prev.includes(chip) ? prev.filter(c => c !== chip) : [...prev, chip]);
+  };
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onload = () => setPhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const QUESTIONS = [
     "What city is your property in?",
-    "What type of property is this for?",
-    "Which services are you interested in? Select all that apply.",
-    "Let's get some details about your project.",
-    "Here's a summary of your request. Please add your contact info to submit.",
+    "Tell us about your project.",
+    "A few more details.",
+    "Almost done! Add your contact info to submit.",
   ];
 
-  const TOTAL_STEPS = 5;
+  const TOTAL_STEPS = 4;
+
+  if (detailsSubmitted) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center p-8" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-center max-w-lg">
+          <div className="w-20 h-20 rounded-full bg-[#58E3EA]/20 flex items-center justify-center mx-auto mb-8">
+            <Check size={40} className="text-[#58E3EA]" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4" data-testid="text-details-complete-headline">
+            Thanks for the extra details!
+          </h1>
+          <p className="text-white/60 text-base leading-relaxed mb-10">
+            This helps us prepare for your estimate visit. Our team will be in touch within one business day.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+            data-testid="button-details-complete-home"
+          >
+            Back to Home
+            <ArrowUpRight size={16} strokeWidth={2.5} />
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (showDetailFlow) {
+    const currentServiceKey = detailStep < activeServiceKeys.length ? activeServiceKeys[detailStep] : null;
+    const currentServiceLabel = currentServiceKey ? SERVICES.find(s => s.id === currentServiceKey)?.label : null;
+    const currentQuestions = currentServiceKey ? SERVICE_QUESTIONS[currentServiceKey] : null;
+    const isContextStep = detailStep === activeServiceKeys.length;
+    const isPhotoStep = detailStep === activeServiceKeys.length + 1;
+
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+          <button onClick={() => detailStep === 0 ? setShowDetailFlow(false) : handleDetailBack()} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors" data-testid="button-detail-back">
+            <ChevronLeft size={16} />
+            <DocoLogo height={18} />
+          </button>
+          <span className="text-[11px] font-bold tracking-wider uppercase text-white/40">
+            {detailStep + 1} of {totalDetailSteps}
+          </span>
+        </div>
+        <div className="h-1 bg-white/[0.06]">
+          <motion.div className="h-full bg-[#58E3EA]" animate={{ width: `${((detailStep + 1) / totalDetailSteps) * 100}%` }} transition={{ duration: 0.3 }} />
+        </div>
+
+        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 py-8 md:py-16">
+          <div className="flex-1">
+            <AnimatePresence mode="wait">
+              <motion.div key={detailStep} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
+
+                {currentServiceKey && currentQuestions && (
+                  <div>
+                    <div className="flex items-start gap-3 mb-8">
+                      <DocoAvatar />
+                      <div>
+                        <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase text-[#58E3EA] mb-1">{currentServiceLabel}</span>
+                        <p className="text-lg md:text-xl font-semibold text-white leading-snug" data-testid="text-detail-question">
+                          {currentQuestions.q1.question}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 mb-8">
+                      {currentQuestions.q1.options.map(opt => {
+                        const selected = serviceAnswers[currentServiceKey]?.[currentQuestions.q1.question] === opt;
+                        return (
+                          <button
+                            key={opt}
+                            onClick={() => setAnswer(currentServiceKey, currentQuestions.q1.question, opt)}
+                            className={`flex items-center gap-4 px-5 py-3.5 rounded-lg border-2 transition-all text-left ${
+                              selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                            }`}
+                            data-testid={`button-detail-q1-${opt.toLowerCase().replace(/\s+/g, "-")}`}
+                          >
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
+                              {selected && <div className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />}
+                            </div>
+                            <span className="text-sm font-medium text-white">{opt}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mb-8">
+                      <p className="text-lg md:text-xl font-semibold text-white leading-snug mb-4" data-testid="text-detail-question-2">
+                        {currentQuestions.q2.question}
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        {currentQuestions.q2.options.map(opt => {
+                          const selected = serviceAnswers[currentServiceKey]?.[currentQuestions.q2.question] === opt;
+                          return (
+                            <button
+                              key={opt}
+                              onClick={() => setAnswer(currentServiceKey, currentQuestions.q2.question, opt)}
+                              className={`flex items-center gap-4 px-5 py-3.5 rounded-lg border-2 transition-all text-left ${
+                                selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                              }`}
+                              data-testid={`button-detail-q2-${opt.toLowerCase().replace(/\s+/g, "-")}`}
+                            >
+                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
+                                {selected && <div className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />}
+                              </div>
+                              <span className="text-sm font-medium text-white">{opt}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {isContextStep && (
+                  <div>
+                    <div className="flex items-start gap-3 mb-8">
+                      <DocoAvatar />
+                      <p className="text-lg md:text-xl font-semibold text-white leading-snug" data-testid="text-context-question">
+                        Anything else that might help us prepare? Select any that apply.
+                      </p>
+                    </div>
+                    {Object.entries(HOME_CONTEXT_CHIPS).map(([category, chips]) => (
+                      <div key={category} className="mb-6">
+                        <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">{category}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {chips.map(chip => {
+                            const selected = homeContext.includes(chip);
+                            return (
+                              <button
+                                key={chip}
+                                onClick={() => toggleContext(chip)}
+                                className={`text-[12px] font-medium px-3 py-2 rounded-lg transition-all ${
+                                  selected ? "text-[#58E3EA] bg-[#58E3EA]/10 border border-[#58E3EA]/30" : "text-white/50 bg-white/[0.04] border border-white/10 hover:text-white/70 hover:bg-white/[0.08]"
+                                }`}
+                                data-testid={`chip-context-${chip.toLowerCase().replace(/\s+/g, "-")}`}
+                              >
+                                {chip}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {isPhotoStep && (
+                  <div>
+                    <div className="flex items-start gap-3 mb-8">
+                      <DocoAvatar />
+                      <p className="text-lg md:text-xl font-semibold text-white leading-snug" data-testid="text-photo-question">
+                        Got a photo? Totally optional.
+                      </p>
+                    </div>
+                    <p className="text-sm text-white/50 mb-6 leading-relaxed">
+                      A photo of the damage, the area, or even just the front of your house is plenty.
+                    </p>
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoSelect} data-testid="input-photo-file" />
+                    {!photoPreview ? (
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full border-2 border-dashed border-white/20 rounded-lg py-12 flex flex-col items-center gap-3 transition-all hover:border-[#58E3EA]/40 hover:bg-[#58E3EA]/[0.02]"
+                        data-testid="button-upload-photo"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-white/[0.06] flex items-center justify-center">
+                          <Camera size={24} className="text-white/40" />
+                        </div>
+                        <span className="text-sm font-medium text-white/50">Tap to upload a photo</span>
+                        <span className="text-[11px] text-white/30">JPG, PNG, or HEIC</span>
+                      </button>
+                    ) : (
+                      <div className="relative rounded-lg overflow-hidden">
+                        <img src={photoPreview} alt="Uploaded" className="w-full max-h-[300px] object-cover rounded-lg" />
+                        <button
+                          onClick={() => { setPhotoFile(null); setPhotoPreview(null); }}
+                          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
+                          data-testid="button-remove-photo"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="flex items-center justify-between pt-6 border-t border-white/[0.06]">
+            <button
+              onClick={detailStep === 0 ? () => setShowDetailFlow(false) : handleDetailBack}
+              className="flex items-center gap-2 text-white/50 text-sm font-medium hover:text-white transition-colors"
+              data-testid="button-detail-step-back"
+            >
+              <ArrowLeft size={16} />
+              Back
+            </button>
+            <button
+              onClick={handleDetailNext}
+              disabled={detailMutation.isPending}
+              className="text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded inline-flex items-center gap-2 transition-all bg-[#58E3EA] text-[#0A0A0A] hover:bg-[#3ABFC6] hover:-translate-y-0.5 cursor-pointer"
+              data-testid="button-detail-step-next"
+            >
+              {detailMutation.isPending ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+                  Submitting...
+                </span>
+              ) : detailStep === totalDetailSteps - 1 ? (
+                <>Submit Details <ArrowUpRight size={16} strokeWidth={2.5} /></>
+              ) : (
+                "Next"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (submitted) {
+    const { firstName } = parseName(formData.fullName);
     return (
       <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center p-8" style={{ fontFamily: "'Montserrat', sans-serif" }}>
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-center max-w-lg">
@@ -328,22 +603,35 @@ export default function EstimatePage() {
             <Check size={40} className="text-[#58E3EA]" />
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4" data-testid="text-success-headline">
-            You're all set, {formData.firstName}!
+            You're all set, {firstName}!
           </h1>
           <p className="text-white/60 text-base leading-relaxed mb-3">
-            Kris and Jenna will personally review your request and get back to you within one business day with a straightforward, no-pressure estimate.
+            Our team will personally review your request and get back to you within one business day with a straightforward, no-pressure estimate.
           </p>
           <p className="text-white/40 text-sm mb-10">
             We've sent a confirmation to <span className="text-[#58E3EA]">{formData.email}</span>
           </p>
-          <button
-            onClick={() => navigate("/")}
-            className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
-            data-testid="button-success-home"
-          >
-            Back to Home
-            <ArrowUpRight size={16} strokeWidth={2.5} />
-          </button>
+          <div className="flex flex-col gap-4 items-center">
+            <button
+              onClick={() => {
+                setShowDetailFlow(true);
+                setDetailStep(0);
+              }}
+              className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+              data-testid="button-add-details"
+            >
+              Add More Details
+              <ArrowUpRight size={16} strokeWidth={2.5} />
+            </button>
+            <p className="text-white/40 text-[13px] mb-2">Help us prepare for your estimate visit with a few optional questions.</p>
+            <button
+              onClick={() => navigate("/")}
+              className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+              data-testid="button-success-home"
+            >
+              No thanks, take me home
+            </button>
+          </div>
         </motion.div>
       </div>
     );
@@ -529,7 +817,7 @@ export default function EstimatePage() {
                           className="text-[12px] font-bold tracking-wider uppercase text-white/60 hover:text-white transition-colors"
                           data-testid="button-continue-after-notify"
                         >
-                          Or continue with an estimate anyway →
+                          Or continue with an estimate anyway &rarr;
                         </button>
                       </motion.div>
                     )}
@@ -537,67 +825,73 @@ export default function EstimatePage() {
                 )}
 
                 {step === 1 && (
-                  <div className="flex flex-col gap-3 mb-8" data-testid="input-property-type">
-                    {PROPERTY_TYPES.map((pt) => {
-                      const selected = formData.propertyType === pt.id;
-                      return (
-                        <button
-                          key={pt.id}
-                          onClick={() => setFormData(prev => ({ ...prev, propertyType: pt.id }))}
-                          className={`flex items-center gap-4 px-5 py-4 rounded-lg border-2 transition-all text-left ${
-                            selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
-                          }`}
-                          data-testid={`button-property-${pt.id}`}
-                        >
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                            selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"
-                          }`}>
-                            {selected && <div className="w-2 h-2 rounded-full bg-[#0A0A0A]" />}
-                          </div>
-                          <span className="text-sm font-medium text-white">{pt.label}</span>
-                        </button>
-                      );
-                    })}
+                  <div className="mb-8">
+                    <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Property type</label>
+                    <div className="flex flex-col gap-3 mb-8" data-testid="input-property-type">
+                      {PROPERTY_TYPES.map((pt) => {
+                        const selected = formData.propertyType === pt.id;
+                        return (
+                          <button
+                            key={pt.id}
+                            onClick={() => setFormData(prev => ({ ...prev, propertyType: pt.id }))}
+                            className={`flex items-center gap-4 px-5 py-4 rounded-lg border-2 transition-all text-left ${
+                              selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                            }`}
+                            data-testid={`button-property-${pt.id}`}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                              selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"
+                            }`}>
+                              {selected && <div className="w-2 h-2 rounded-full bg-[#0A0A0A]" />}
+                            </div>
+                            <span className="text-sm font-medium text-white">{pt.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {formData.propertyType && (
+                      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+                        <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Which services are you interested in?</label>
+                        <div className="grid grid-cols-2 gap-3" data-testid="input-services">
+                          {SERVICES.map((svc) => {
+                            const selected = formData.services.includes(svc.id);
+                            return (
+                              <button
+                                key={svc.id}
+                                onClick={() => toggleService(svc.id)}
+                                className={`relative overflow-hidden rounded-lg border-2 transition-all aspect-[4/3] group ${
+                                  selected ? "border-[#58E3EA]" : "border-white/10 hover:border-white/20"
+                                }`}
+                                data-testid={`button-service-${svc.id}`}
+                              >
+                                <img
+                                  src={SERVICE_IMAGES[svc.id]}
+                                  alt={svc.label}
+                                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${
+                                    selected ? "opacity-60 scale-[1.02]" : "opacity-40 group-hover:opacity-50"
+                                  }`}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                                <div className="relative z-10 flex flex-col items-start justify-end h-full p-4">
+                                  <span className="text-sm font-bold text-white">{svc.label}</span>
+                                  <span className="text-[11px] text-white/60">{svc.desc}</span>
+                                </div>
+                                {selected && (
+                                  <div className="absolute top-3 right-3 w-6 h-6 rounded bg-[#58E3EA] flex items-center justify-center z-10">
+                                    <Check size={14} strokeWidth={3} className="text-[#0A0A0A]" />
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                 )}
 
                 {step === 2 && (
-                  <div className="grid grid-cols-2 gap-3 mb-8" data-testid="input-services">
-                    {SERVICES.map((svc) => {
-                      const selected = formData.services.includes(svc.id);
-                      return (
-                        <button
-                          key={svc.id}
-                          onClick={() => toggleService(svc.id)}
-                          className={`relative overflow-hidden rounded-lg border-2 transition-all aspect-[4/3] group ${
-                            selected ? "border-[#58E3EA]" : "border-white/10 hover:border-white/20"
-                          }`}
-                          data-testid={`button-service-${svc.id}`}
-                        >
-                          <img
-                            src={SERVICE_IMAGES[svc.id]}
-                            alt={svc.label}
-                            className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${
-                              selected ? "opacity-60 scale-[1.02]" : "opacity-40 group-hover:opacity-50"
-                            }`}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                          <div className="relative z-10 flex flex-col items-start justify-end h-full p-4">
-                            <span className="text-sm font-bold text-white">{svc.label}</span>
-                            <span className="text-[11px] text-white/60">{svc.desc}</span>
-                          </div>
-                          {selected && (
-                            <div className="absolute top-3 right-3 w-6 h-6 rounded bg-[#58E3EA] flex items-center justify-center z-10">
-                              <Check size={14} strokeWidth={3} className="text-[#0A0A0A]" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {step === 3 && (
                   <div className="mb-8 space-y-8">
                     <div>
                       <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Is this an insurance claim?</label>
@@ -630,12 +924,7 @@ export default function EstimatePage() {
                           return (
                             <button
                               key={tl.id}
-                              onClick={() => {
-                                setFormData(prev => ({ ...prev, projectTimeline: tl.id }));
-                                setTimeout(() => {
-                                  offeringsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                                }, 100);
-                              }}
+                              onClick={() => setFormData(prev => ({ ...prev, projectTimeline: tl.id }))}
                               className={`flex items-center gap-4 px-5 py-3.5 rounded-lg border-2 transition-all text-left ${
                                 selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
                               }`}
@@ -652,154 +941,77 @@ export default function EstimatePage() {
                         })}
                       </div>
                     </div>
-
-                    {formData.projectTimeline && formData.services.length > 0 && (
-                      <motion.div
-                        ref={offeringsRef}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35 }}
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <label className="text-[11px] font-bold tracking-wider uppercase text-white/40">What are you looking for?</label>
-                          <button
-                            onClick={toggleAllOfferings}
-                            className="text-[11px] font-bold tracking-wider uppercase text-[#58E3EA] hover:text-[#3ABFC6] transition-colors"
-                            data-testid="button-select-all-offerings"
-                          >
-                            {allOfferingsSelected ? "Deselect all" : "Select all"}
-                          </button>
-                        </div>
-                        {formData.services.map(svcId => {
-                          const svc = SERVICES.find(s => s.id === svcId);
-                          const offerings = SERVICE_OFFERINGS[svcId] || [];
-                          if (!svc) return null;
-                          return (
-                            <div key={svcId} className="mb-4">
-                              <p className="text-[12px] font-semibold text-white/60 mb-2 uppercase tracking-wide">{svc.label}</p>
-                              <div className="flex flex-wrap gap-2">
-                                {offerings.map(offering => {
-                                  const selected = formData.selectedOfferings.includes(offering);
-                                  return (
-                                    <button
-                                      key={offering}
-                                      onClick={() => toggleOffering(offering)}
-                                      className={`text-[11px] font-medium px-2.5 py-1 rounded transition-all cursor-pointer ${
-                                        selected
-                                          ? "text-[#58E3EA] bg-[#58E3EA]/10"
-                                          : "text-white/40 bg-white/[0.04] hover:text-white/60 hover:bg-white/[0.08]"
-                                      }`}
-                                      data-testid={`button-offering-${offering.toLowerCase().replace(/\s+/g, "-")}`}
-                                    >
-                                      {offering}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        })}
-
-                        <div className="mt-6">
-                          <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Other details (optional)</label>
-                          <textarea
-                            placeholder="Anything else we should know about your project?"
-                            value={formData.additionalDetails}
-                            onChange={(e) => setFormData(prev => ({ ...prev, additionalDetails: e.target.value }))}
-                            rows={3}
-                            className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03] resize-none"
-                            data-testid="input-additional-details"
-                          />
-                        </div>
-                      </motion.div>
-                    )}
                   </div>
                 )}
 
-                {step === 4 && (
+                {step === 3 && (
                   <div className="mb-8">
-                    <div className="bg-white/[0.03] border border-white/10 rounded-lg overflow-hidden mb-8">
-                      <div className="p-5 border-b border-white/[0.06]">
-                        <div className="flex items-center gap-3 mb-3">
-                          <MapPin size={14} className="text-[#58E3EA]" />
-                          <span className="text-sm font-semibold text-white">{formData.city}, MN</span>
-                          {formData.cityType === "surrounding" && (
-                            <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded">Expanding Soon</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Home size={14} className="text-[#58E3EA]" />
-                          <span className="text-sm text-white/70">{PROPERTY_TYPES.find(p => p.id === formData.propertyType)?.label}</span>
-                        </div>
-                      </div>
-
-                      <div className="p-5 border-b border-white/[0.06]">
-                        <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Services</p>
-                        <div className="flex gap-3 flex-wrap">
-                          {formData.services.map(svcId => {
-                            const svc = SERVICES.find(s => s.id === svcId);
-                            return (
-                              <div key={svcId} className="relative w-[100px] h-[70px] rounded overflow-hidden">
-                                <img src={SERVICE_IMAGES[svcId]} alt={svc?.label} className="w-full h-full object-cover opacity-60" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                                <span className="absolute bottom-2 left-2 text-[11px] font-bold text-white">{svc?.label}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {formData.selectedOfferings.length > 0 && (
-                        <div className="p-5 border-b border-white/[0.06]">
-                          <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Specific Needs</p>
-                          <div className="flex flex-wrap gap-2">
-                            {formData.selectedOfferings.map(o => (
-                              <span key={o} className="text-[11px] font-medium text-[#58E3EA] bg-[#58E3EA]/10 px-2.5 py-1 rounded">{o}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="p-5">
-                        <div className="grid grid-cols-2 gap-y-3 text-sm">
-                          <div>
-                            <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Insurance</span>
-                            <p className="text-white/80 mt-0.5">{formData.hasInsuranceClaim === true ? "Yes" : formData.hasInsuranceClaim === false ? "No" : "Not specified"}</p>
-                          </div>
-                          <div>
-                            <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Timeline</span>
-                            <p className="text-white/80 mt-0.5">{TIMELINES.find(t => t.id === formData.projectTimeline)?.label}</p>
-                          </div>
-                          {formData.additionalDetails && (
-                            <div className="col-span-2 mt-2">
-                              <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Details</span>
-                              <p className="text-white/60 mt-0.5 text-[13px] leading-relaxed">{formData.additionalDetails}</p>
+                    <div className="mb-6">
+                      <button
+                        onClick={() => setReviewExpanded(!reviewExpanded)}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.05]"
+                        data-testid="button-toggle-review"
+                      >
+                        <span className="text-[11px] font-bold tracking-wider uppercase text-white/40">Review Your Selections</span>
+                        <ChevronDown size={16} className={`text-white/40 transition-transform ${reviewExpanded ? "rotate-180" : ""}`} />
+                      </button>
+                      {reviewExpanded && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="bg-white/[0.03] border border-t-0 border-white/10 rounded-b-lg overflow-hidden">
+                          <div className="p-5 border-b border-white/[0.06]">
+                            <div className="flex items-center gap-3 mb-3">
+                              <MapPin size={14} className="text-[#58E3EA]" />
+                              <span className="text-sm font-semibold text-white">{formData.city}, MN</span>
+                              {formData.cityType === "surrounding" && (
+                                <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded">Expanding Soon</span>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      </div>
+                            <div className="flex items-center gap-3">
+                              <Home size={14} className="text-[#58E3EA]" />
+                              <span className="text-sm text-white/70">{PROPERTY_TYPES.find(p => p.id === formData.propertyType)?.label}</span>
+                            </div>
+                          </div>
+                          <div className="p-5 border-b border-white/[0.06]">
+                            <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Services</p>
+                            <div className="flex gap-3 flex-wrap">
+                              {formData.services.map(svcId => {
+                                const svc = SERVICES.find(s => s.id === svcId);
+                                return (
+                                  <div key={svcId} className="relative w-[100px] h-[70px] rounded overflow-hidden">
+                                    <img src={SERVICE_IMAGES[svcId]} alt={svc?.label} className="w-full h-full object-cover opacity-60" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                                    <span className="absolute bottom-2 left-2 text-[11px] font-bold text-white">{svc?.label}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          <div className="p-5">
+                            <div className="grid grid-cols-2 gap-y-3 text-sm">
+                              <div>
+                                <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Insurance</span>
+                                <p className="text-white/80 mt-0.5">{formData.hasInsuranceClaim === true ? "Yes" : formData.hasInsuranceClaim === false ? "No" : "Not specified"}</p>
+                              </div>
+                              <div>
+                                <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Timeline</span>
+                                <p className="text-white/80 mt-0.5">{TIMELINES.find(t => t.id === formData.projectTimeline)?.label}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
                     </div>
 
                     <div className="space-y-4">
                       <p className="text-[11px] font-bold tracking-wider uppercase text-white/40">Your Information</p>
-                      <div className="grid grid-cols-2 gap-3">
-                        <input
-                          type="text"
-                          placeholder="First name"
-                          value={formData.firstName}
-                          onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                          className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03]"
-                          data-testid="input-first-name"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Last name"
-                          value={formData.lastName}
-                          onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                          className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03]"
-                          data-testid="input-last-name"
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        placeholder="Full name"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                        className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03]"
+                        data-testid="input-full-name"
+                      />
+                      <p className="text-[11px] text-white/30 -mt-2">First and Last name</p>
                       <div>
                         <input
                           type="email"
@@ -866,7 +1078,7 @@ export default function EstimatePage() {
                   </svg>
                   Submitting...
                 </span>
-              ) : step === 4 ? (
+              ) : step === 3 ? (
                 <>
                   Submit Request
                   <ArrowUpRight size={16} strokeWidth={2.5} />

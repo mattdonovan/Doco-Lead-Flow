@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -23,6 +23,9 @@ export const quoteRequests = pgTable("quote_requests", {
   additionalDetails: text("additional_details"),
   hasInsuranceClaim: boolean("has_insurance_claim").default(false),
   selectedOfferings: text("selected_offerings").array(),
+  serviceDetails: jsonb("service_details"),
+  homeContext: text("home_context").array(),
+  photoUrl: text("photo_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

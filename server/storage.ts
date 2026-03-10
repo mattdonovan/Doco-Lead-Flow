@@ -8,6 +8,8 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createQuoteRequest(data: InsertQuoteRequest): Promise<QuoteRequest>;
   getQuoteRequests(): Promise<QuoteRequest[]>;
+  getQuoteRequest(id: string): Promise<QuoteRequest | undefined>;
+  updateQuoteDetails(id: string, data: { serviceDetails?: unknown; homeContext?: string[]; photoUrl?: string; selectedOfferings?: string[]; additionalDetails?: string }): Promise<QuoteRequest | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -33,6 +35,23 @@ export class DatabaseStorage implements IStorage {
 
   async getQuoteRequests(): Promise<QuoteRequest[]> {
     return db.select().from(quoteRequests);
+  }
+
+  async getQuoteRequest(id: string): Promise<QuoteRequest | undefined> {
+    const [quote] = await db.select().from(quoteRequests).where(eq(quoteRequests.id, id));
+    return quote || undefined;
+  }
+
+  async updateQuoteDetails(id: string, data: { serviceDetails?: unknown; homeContext?: string[]; photoUrl?: string; selectedOfferings?: string[]; additionalDetails?: string }): Promise<QuoteRequest | undefined> {
+    const updateData: Record<string, unknown> = {};
+    if (data.serviceDetails !== undefined) updateData.serviceDetails = data.serviceDetails;
+    if (data.homeContext !== undefined) updateData.homeContext = data.homeContext;
+    if (data.photoUrl !== undefined) updateData.photoUrl = data.photoUrl;
+    if (data.selectedOfferings !== undefined) updateData.selectedOfferings = data.selectedOfferings;
+    if (data.additionalDetails !== undefined) updateData.additionalDetails = data.additionalDetails;
+
+    const [quote] = await db.update(quoteRequests).set(updateData).where(eq(quoteRequests.id, id)).returning();
+    return quote || undefined;
   }
 }
 

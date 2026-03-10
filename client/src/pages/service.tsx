@@ -45,7 +45,7 @@ const SERVICES: Record<string, ServiceData> = {
     heroImage: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png",
     description: "New siding transforms your home's appearance while providing critical protection against moisture, wind, and temperature extremes. DOCO Exteriors installs top-tier siding products that combine beauty, durability, and energy efficiency.",
     features: [
-      { title: "Fiber Cement Siding", desc: "The gold standard in exterior cladding. Fiber cement siding resists fire, moisture, pests, and rot while maintaining its beautiful appearance for decades with minimal maintenance." },
+      { title: "Steel Siding", desc: "The gold standard in exterior cladding. Steel siding resists fire, moisture, pests, and rot while maintaining its beautiful appearance for decades with minimal maintenance." },
       { title: "Vinyl Siding", desc: "Cost-effective and versatile, modern vinyl siding offers excellent insulation properties, comes in a wide range of colors and styles, and never needs painting." },
       { title: "Engineered Wood Siding", desc: "Get the natural beauty of real wood with enhanced durability. Engineered wood siding resists splitting, cracking, and decay while providing authentic wood grain textures." },
       { title: "Soffit & Fascia", desc: "Complete your home's exterior with properly installed soffit and fascia that protect your roof structure, improve attic ventilation, and give your home a finished, polished look." },
@@ -67,7 +67,7 @@ const SERVICES: Record<string, ServiceData> = {
     heroImage: "https://cdn.midjourney.com/15c2b54f-384d-4719-9eab-116caf3f4bc9/0_0.png",
     description: "Old, drafty windows cost you money every month and compromise your home's comfort. DOCO Exteriors installs Minnesota-rated, energy-efficient windows that keep your home comfortable year-round while reducing your energy bills.",
     features: [
-      { title: "Double & Triple Pane", desc: "Advanced multi-pane glass with argon or krypton gas fill provides superior insulation, reducing heat transfer and keeping your home comfortable through Minnesota's temperature extremes." },
+      { title: "Double & Triple Pane", desc: "Advanced multi-pane glass provides superior insulation, reducing heat transfer and keeping your home comfortable through Minnesota's temperature extremes." },
       { title: "Custom Sizing & Styles", desc: "Every window is measured and manufactured to fit your home perfectly. Choose from casement, double-hung, sliding, bay, bow, and specialty shapes to match your home's architecture." },
       { title: "Low-E Glass Coating", desc: "Low-emissivity coatings reflect heat back into your home during winter and block solar heat gain during summer, significantly reducing your HVAC costs year-round." },
       { title: "Full Frame Replacement", desc: "When simple insert replacements aren't enough, our full-frame installation method ensures proper insulation, flashing, and weatherproofing for maximum energy efficiency and longevity." },

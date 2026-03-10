@@ -5,18 +5,17 @@ import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, 
 
 const PROCESS_STEPS = [
   { num: "01", title: "Free Inspection", desc: "Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work." },
-  { num: "02", title: "Filing an Insurance Claim", desc: "If the damage may qualify for insurance coverage, the next step is filing a claim with your insurance company. Your Project Manager will provide the documentation and scope information necessary to support your claim and help guide you through the process." },
-  { num: "03", title: "Scope Agreement", desc: "In many cases, your Project Manager will meet with your insurance company's representative onsite to review the damage and confirm the scope of work. Once the insurance company has completed their review, we will meet with you to walk through the final approved scope of the project." },
-  { num: "04", title: "Design Meeting", desc: "Before construction begins, we will hold a design meeting to finalize the details of your project. During this meeting, we will confirm product selections, review construction plans, and address any special considerations or requests you may have for your build day." },
-  { num: "05", title: "Project Scheduling", desc: "Once selections are finalized, our team will place orders with our suppliers and coordinate with our construction crews. Within approximately 72 hours of your design meeting, we will confirm product availability and provide you with an estimated timeline for your project." },
-  { num: "06", title: "Project Scheduled", desc: "When materials are ready and scheduling is finalized, our team will contact you to confirm your construction dates. Materials will typically be delivered to your driveway prior to the start of construction, and we will confirm the expected start and completion dates with you." },
-  { num: "07", title: "Build Day", desc: "Construction day can be busy, loud, and exciting as your home transformation begins. Your Project Manager will provide a preparation guide beforehand to help minimize inconvenience for you and your family." },
-  { num: "08", title: "Project Completion", desc: "With construction complete, you can enjoy the improved look, protection, and value of your home. You will receive a final paid-in-full invoice for your records, along with any applicable warranty documentation." },
+  { num: "02", title: "Potential Insurance Claim", desc: "If the damage may qualify for insurance coverage, the next step is filing a claim with your insurance company. Your Project Manager will provide the documentation and scope information necessary to support your claim and help guide you through the process.", callout: "In many cases, your Project Manager will meet with your insurance company's representative onsite to review the damage and confirm the scope of work. Once approved, we'll walk through the final scope together." },
+  { num: "03", title: "Design Meeting", desc: "Before construction begins, we will hold a design meeting to finalize the details of your project. During this meeting, we will confirm product selections, review construction plans, and address any special considerations or requests you may have for your build day." },
+  { num: "04", title: "Project Scheduling", desc: "Once selections are finalized, our team will place orders with our suppliers and coordinate with our construction crews. Within approximately 72 hours of your design meeting, we will confirm product availability and provide you with an estimated timeline for your project." },
+  { num: "05", title: "Project Scheduled", desc: "When materials are ready and scheduling is finalized, our team will contact you to confirm your construction dates. Materials will typically be delivered to your driveway prior to the start of construction, and we will confirm the expected start and completion dates with you." },
+  { num: "06", title: "Build Day", desc: "Construction day can be busy, loud, and exciting as your home transformation begins. Your Project Manager will provide a preparation guide beforehand to help minimize inconvenience for you and your family." },
+  { num: "07", title: "Project Completion", desc: "With construction complete, you can enjoy the improved look, protection, and value of your home. You will receive a final paid-in-full invoice for your records, along with any applicable warranty documentation." },
 ];
 
 const SLIDE_COLORS = [
   "bg-[#0D2B2E]", "bg-[#0B2035]", "bg-[#162830]", "bg-[#0F1F2B]",
-  "bg-[#192B28]", "bg-[#1A2030]", "bg-[#1C2820]", "bg-[#101E2A]",
+  "bg-[#192B28]", "bg-[#1A2030]", "bg-[#1C2820]",
 ];
 
 const CTA_BG_COLORS = [
@@ -26,13 +25,15 @@ const CTA_BG_COLORS = [
 
 export function GuidedProcess() {
   const [activeStep, setActiveStep] = useState(0);
+  const step = PROCESS_STEPS[activeStep];
 
   return (
     <section className="bg-[#111111] text-white px-8 md:px-20 py-24">
       <h2 className="text-[clamp(26px,3vw,38px)] font-extrabold tracking-tight pb-12" data-testid="text-process-headline">Our Guided Process</h2>
-      <div className="grid grid-cols-1 md:grid-cols-[280px_1fr]">
+
+      <div className="hidden md:grid md:grid-cols-[280px_1fr]">
         <div className="border-r border-white/[0.07] flex flex-col">
-          {PROCESS_STEPS.map((step, i) => (
+          {PROCESS_STEPS.map((s, i) => (
             <button
               key={i}
               onClick={() => setActiveStep(i)}
@@ -53,10 +54,10 @@ export function GuidedProcess() {
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className={`text-[10px] font-bold tracking-[0.14em] uppercase transition-colors ${activeStep === i ? "text-[#58E3EA]" : "text-white/[0.28]"}`}>
-                  {step.num}
+                  {s.num}
                 </span>
                 <span className={`text-[13px] leading-snug transition-colors ${activeStep === i ? "text-white font-bold" : "text-white/[0.42] font-semibold"}`}>
-                  {step.title}
+                  {s.title}
                 </span>
               </div>
             </button>
@@ -70,31 +71,56 @@ export function GuidedProcess() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -14 }}
               transition={{ duration: 0.38 }}
-              className={`flex flex-col h-full ${SLIDE_COLORS[activeStep]}`}
+              className={`relative flex flex-col h-full min-h-[400px] ${SLIDE_COLORS[activeStep % SLIDE_COLORS.length]}`}
             >
-              <div className="flex items-center justify-center p-8 md:p-12">
-                <div className="w-40 h-40 rounded-full border-2 border-dashed border-white/10 flex items-center justify-center flex-col gap-2.5">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(88,227,234,0.22)" strokeWidth="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <path d="M3 9h18M9 21V9" />
-                  </svg>
-                  <span className="text-[10px] font-semibold tracking-wider uppercase text-white/[0.18] text-center">Animation<br />Area</span>
-                </div>
-              </div>
-              <div className="px-10 md:px-14 pb-10 md:pb-14 flex flex-col justify-center flex-1">
+              <div className="relative z-10 flex flex-col justify-end h-full px-14 pb-14 pt-16">
                 <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-4">
-                  Step {PROCESS_STEPS[activeStep].num} of 08
+                  Step {step.num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
                 </div>
                 <h3 className="text-[clamp(20px,2.2vw,30px)] font-extrabold tracking-tight leading-[1.15] mb-4 text-white">
-                  {PROCESS_STEPS[activeStep].title}
+                  {step.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-white/[0.58] max-w-[420px]">
-                  {PROCESS_STEPS[activeStep].desc}
+                  {step.desc}
                 </p>
+                {"callout" in step && step.callout && (
+                  <div className="mt-5 bg-white/[0.06] border border-white/10 rounded-lg p-4 max-w-[420px]">
+                    <p className="text-[10px] font-bold tracking-wider uppercase text-[#58E3EA] mb-2">Scope Agreement</p>
+                    <p className="text-[13px] leading-relaxed text-white/50">{step.callout}</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
+
+      <div className="md:hidden flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-8 px-8 scrollbar-hide" style={{ WebkitOverflowScrolling: "touch" }}>
+        {PROCESS_STEPS.map((s, i) => (
+          <div
+            key={i}
+            className={`relative snap-start shrink-0 w-[80vw] min-h-[320px] rounded-lg overflow-hidden flex flex-col justify-end ${SLIDE_COLORS[i % SLIDE_COLORS.length]}`}
+            data-testid={`card-process-mobile-${i}`}
+          >
+            <div className="relative z-10 p-6 flex flex-col justify-end flex-1">
+              <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-3">
+                Step {s.num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
+              </div>
+              <h3 className="text-xl font-extrabold tracking-tight leading-[1.15] mb-3 text-white">
+                {s.title}
+              </h3>
+              <p className="text-[13px] leading-relaxed text-white/[0.58]">
+                {s.desc}
+              </p>
+              {"callout" in s && s.callout && (
+                <div className="mt-4 bg-white/[0.06] border border-white/10 rounded-lg p-3">
+                  <p className="text-[10px] font-bold tracking-wider uppercase text-[#58E3EA] mb-1.5">Scope Agreement</p>
+                  <p className="text-[12px] leading-relaxed text-white/50">{s.callout}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -126,7 +152,7 @@ export function CTASection() {
           Ready for a<br/><span className="text-[#58E3EA]">Free Estimate?</span>
         </h2>
         <p className="mt-5 text-base text-white/50 leading-relaxed max-w-[440px]">
-          Kris and Jenna personally review every request. We'll get back to you within one business day with a straightforward, no-pressure estimate.
+          Our team personally reviews every request. We'll get back to you within one business day with a straightforward, no-pressure estimate.
         </p>
       </div>
       <div className="flex flex-col items-start lg:items-center gap-6">
@@ -155,7 +181,7 @@ export function SiteFooter() {
         <div className="flex flex-col items-start gap-5 lg:col-span-1 md:col-span-2">
           <img src="/logo-footer.svg" alt="DOCO Exteriors" style={{ height: 56, width: "auto" }} />
           <p className="text-[13px] text-white/50 leading-relaxed max-w-[280px]">
-            Minneapolis-based exterior contractors you can count on. Kris & Jenna Donovan, owners.
+            Minneapolis-based exterior contractors you can count on. Locally owned.
           </p>
           <div className="flex gap-3 mt-1">
             <div className="w-9 h-9 border border-white/15 rounded-sm flex items-center justify-center cursor-pointer transition-all hover:border-[#58E3EA] hover:bg-[#58E3EA]/10" data-testid="button-social-facebook">
@@ -197,7 +223,7 @@ export function SiteFooter() {
       </div>
       <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-[12px] text-white/30">
-          &copy; 2025 DOCO Exteriors. All rights reserved. Owned by <a href="#" className="text-[#58E3EA]">Kris & Jenna Donovan</a>.
+          &copy; 2025 DOCO Exteriors. All rights reserved. Locally owned and operated.
         </p>
         <p className="text-[12px] text-white/30">
           <a href="#" className="text-[#58E3EA]">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="#" className="text-[#58E3EA]">Terms of Service</a>
@@ -260,7 +286,7 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
 
 const ALL_SERVICES = [
   { tag: "Roofing", title: "Roof Replacement & Repair", desc: "From storm damage to full replacements, we handle asphalt, metal, and architectural shingles with precision.", img: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png", slug: "roofing" },
-  { tag: "Siding", title: "Siding Installation", desc: "Fiber cement, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.", img: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png", slug: "siding" },
+  { tag: "Siding", title: "Siding Installation", desc: "Steel, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.", img: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png", slug: "siding" },
   { tag: "Windows", title: "Window Replacement", desc: "Energy-efficient, Minnesota-rated windows installed to keep heat in and cold out — lowering your bills year-round.", img: "https://cdn.midjourney.com/15c2b54f-384d-4719-9eab-116caf3f4bc9/0_0.png", slug: "windows" },
   { tag: "Gutters", title: "Gutter Systems", desc: "Seamless gutters, guards, and downspout systems that protect your foundation through Minnesota's harshest seasons.", img: "https://cdn.midjourney.com/10a24684-6aa4-4c97-8ad4-e6ce00a8fb6f/0_0.png", slug: "gutters" },
 ];
