@@ -1,0 +1,95 @@
+1. MOBILE LAYOUT — Hero
+
+Use only the bottom stock photo (remove the top one)
+On mobile: make the photo a full-bleed background with a dark overlay for text legibility
+
+2. MOBILE LAYOUT — Services Section
+
+Desktop: keep current card grid
+Mobile: convert to a swipeable carousel (touch/click interaction)
+
+3. MOBILE LAYOUT — Our Guided Process
+
+Desktop: keep existing timeline + slides
+Mobile: remove the timeline entirely, convert process slides to the same carousel pattern as services
+
+
+4. CONTENT UPDATES — Our Guided Process
+
+Rename "Filing an Insurance Claim" → "Potential Insurance Claim"
+Remove the "Scope Agreement" slide entirely
+Fold Scope Agreement content into the Insurance Claim slide as a callout within the layout
+Update all slide layouts to treat the full slide area as a background canvas (for future animation/image/video — content overlays on top)
+
+5. CONTENT UPDATES — Services Copy
+
+Windows: remove mention of argon or krypton gas
+Siding: remove "Fiber cement", replace with "Steel"
+
+6. CONTENT UPDATES — Names
+
+Replace all instances of "Kris", "Jenna", or "Kris and Jenna" with "Our Team" site-wide
+Exception: the /about page — leave names as-is
+This includes any name references inside the lead gen form (e.g. the expectations/confirmation copy)
+
+
+7. LEAD GEN FLOW — Step Consolidation
+
+Combine the Property Type step and the Services step into a single screen
+After a property type is selected, progressively disclose the service options immediately below (no separate screen)
+
+8. LEAD GEN FLOW — Review Screen
+
+Collapse the review detail section into an expandable/accordion card so contact info is the primary visible element
+Combine First Name + Last Name into a single "Full Name" field with hint text: First and Last name
+
+9. LEAD GEN FLOW — Submission & Post-Submit
+
+Move service level selections (e.g. Full Roof Replacement, Storm Damage Repair) and "other details" out of the main flow
+These become an optional post-submission segment
+Update the success screen to:
+
+Confirm submission
+Prompt user to optionally add more detail to help prepare for the estimate visit
+Offer a clear path back to the home page if they decline
+
+
+
+
+10. LEAD GEN FLOW — Optional Detail Flow (post-submit)
+
+Entry message: "We can already tell this will be a great partnership." Then proceed into the detail questions
+Flow branches by selected service(s), one screen per service:
+Roofing
+
+How old is your current roof? → Under 10 years / 10–20 years / 20+ years / Don't know
+What's the situation? → Active leak or water damage / Missing or visibly damaged shingles / Storm or hail damage / Just aging — time for a replacement / Not sure, need an inspection
+
+Siding
+
+What's your current siding material? → Vinyl / Wood / Fiber cement / Hardie / Not sure
+What's driving this project? → Visible damage or rot / Storm damage / Just outdated — ready for an upgrade / Selling the home soon / Not sure, need an opinion
+
+Windows
+
+Roughly how many windows? → 1 to 3 / 4 to 8 / 9 or more / Full house — not sure on count
+What's the main reason? → Drafty or poor insulation / Condensation or fogging between panes / Damaged / won't open or close / Storm damage / Just upgrading for curb appeal
+
+Gutters
+
+What's the main issue? → Overflowing during rain / Sagging or pulling away / Visible damage or holes / I don't have gutters yet / Full replacement — they're just old
+Do you have gutter guards? → Yes / No / Not sure
+
+
+Then universal Screen 5 — Home context chips (multi-select, no wrong answers):
+About the home: Just bought this home / Getting ready to sell / Previous work done here / HOA approval may be needed
+About the job: Two stories or higher / Steep roof pitch / Detached garage to include / Hard to access areas
+About you: I've gotten other estimates already / I'd like to be home during the estimate / I prefer communication by text / I prefer communication by phone
+Then Screen 6 — Optional photo upload with helper text: "A photo of the damage, the area, or even just the front of your house is plenty."
+
+
+11. LEAD GEN FLOW — Email Notifications
+
+On initial submission: send notification email to DOCO using Template 1 (initial lead)
+On optional detail submission: update the lead record and send a second notification email using Template 2 (lead update, contextualized as additional detail)
+On detail submission: also send a copy of the email to the person who submitted the form
