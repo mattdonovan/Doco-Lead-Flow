@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText } from "lucide-react";
+import inspectionBg from "@assets/inspection_1773281595728.jpg";
 
 const PROCESS_STEPS = [
-  { num: "01", title: "Free Inspection", desc: "Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work." },
+  { num: "01", title: "Free Inspection", desc: "Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work.", bgImage: inspectionBg },
   { num: "02", title: "Potential Insurance Claim", desc: "If the damage may qualify for insurance coverage, the next step is filing a claim with your insurance company. Your Project Manager will provide the documentation and scope information necessary to support your claim and help guide you through the process.", callout: "In many cases, your Project Manager will meet with your insurance company's representative onsite to review the damage and confirm the scope of work. Once approved, we'll walk through the final scope together." },
   { num: "03", title: "Design Meeting", desc: "Before construction begins, we will hold a design meeting to finalize the details of your project. During this meeting, we will confirm product selections, review construction plans, and address any special considerations or requests you may have for your build day." },
   { num: "04", title: "Project Scheduling", desc: "Once selections are finalized, our team will place orders with our suppliers and coordinate with our construction crews. Within approximately 72 hours of your design meeting, we will confirm product availability and provide you with an estimated timeline for your project." },
@@ -73,6 +74,12 @@ export function GuidedProcess() {
               transition={{ duration: 0.38 }}
               className={`relative flex flex-col h-full min-h-[400px] ${SLIDE_COLORS[activeStep % SLIDE_COLORS.length]}`}
             >
+              {"bgImage" in step && step.bgImage && (
+                <>
+                  <img src={step.bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D2B2E]/90 via-[#0D2B2E]/40 to-transparent" />
+                </>
+              )}
               <div className="relative z-10 flex flex-col justify-end h-full px-14 pb-14 pt-16">
                 <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-4">
                   Step {step.num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
@@ -102,6 +109,12 @@ export function GuidedProcess() {
             className={`relative snap-start shrink-0 w-[80vw] min-h-[320px] rounded-lg overflow-hidden flex flex-col justify-end ${SLIDE_COLORS[i % SLIDE_COLORS.length]}`}
             data-testid={`card-process-mobile-${i}`}
           >
+            {"bgImage" in s && s.bgImage && (
+              <>
+                <img src={s.bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0D2B2E]/90 via-[#0D2B2E]/40 to-transparent" />
+              </>
+            )}
             <div className="relative z-10 p-6 flex flex-col justify-end flex-1">
               <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-3">
                 Step {s.num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
