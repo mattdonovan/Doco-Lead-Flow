@@ -10,6 +10,8 @@ import kris_and_jenna from "@assets/kris-and-jenna.jpg";
 
 import model_house_1_small from "@assets/model-house 1 small.png";
 
+import model_house_squooshed from "@assets/model-house-squooshed.jpg";
+
 const SERVICE_LINKS: Record<string, string> = {
   Roofing: "/services/roofing",
   Siding: "/services/siding",
@@ -125,7 +127,7 @@ export default function Home() {
           <div className="relative bg-[#1A1A1A] hidden lg:block">
             <div className="overflow-hidden h-full">
               <img
-                src="https://cdn.midjourney.com/451fd5bc-42cb-473f-aec1-424d07999111/0_0.png"
+                src={model_house_squooshed}
                 alt="Home exterior"
                 className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-[6s]"
               />
