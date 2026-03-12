@@ -125,7 +125,7 @@ export default function Home() {
           <div className="relative bg-[#1A1A1A] hidden lg:block">
             <div className="overflow-hidden h-full">
               <img
-                src={model_house_1_small}
+                src="https://cdn.midjourney.com/451fd5bc-42cb-473f-aec1-424d07999111/0_0.png"
                 alt="Home exterior"
                 className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-[6s]"
               />
