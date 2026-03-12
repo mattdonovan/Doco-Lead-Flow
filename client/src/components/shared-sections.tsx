@@ -96,12 +96,6 @@ export function GuidedProcess() {
                 <p className="text-sm leading-relaxed text-white/[0.58] max-w-[420px]">
                   {step.desc}
                 </p>
-                {"callout" in step && step.callout && (
-                  <div className="mt-5 bg-white/[0.06] border border-white/10 rounded-lg p-4 max-w-[420px]">
-                    <p className="text-[10px] font-bold tracking-wider uppercase text-[#58E3EA] mb-2">Scope Agreement</p>
-                    <p className="text-[13px] leading-relaxed text-white/50">{step.callout}</p>
-                  </div>
-                )}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -131,12 +125,6 @@ export function GuidedProcess() {
               <p className="text-[13px] leading-relaxed text-white/[0.58]">
                 {s.desc}
               </p>
-              {"callout" in s && s.callout && (
-                <div className="mt-4 bg-white/[0.06] border border-white/10 rounded-lg p-3">
-                  <p className="text-[10px] font-bold tracking-wider uppercase text-[#58E3EA] mb-1.5">Scope Agreement</p>
-                  <p className="text-[12px] leading-relaxed text-white/50">{s.callout}</p>
-                </div>
-              )}
             </div>
           </div>
         ))}
