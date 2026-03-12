@@ -66,7 +66,7 @@ export default function Home() {
       <section id="home" className="relative min-h-screen pt-[68px] bg-[#0A0A0A]">
         <div className="absolute inset-0 lg:hidden">
           <img
-            src="https://cdn.midjourney.com/2648b2be-29ad-430f-9d89-c317e55e7505/0_0.png"
+            src={model_house_squooshed}
             alt="Home exterior"
             className="w-full h-full object-cover"
           />
