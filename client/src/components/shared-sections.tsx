@@ -5,15 +5,19 @@ import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, 
 import inspectionBg from "@assets/inspection_1773281595728.jpg";
 import insuranceBg from "@assets/insurance_1773282351361.jpg";
 import designMeetingBg from "@assets/design-meeting_1773282354653.jpg";
+import schedulingBg from "@assets/scheduling_1773283819734.jpg";
+import scheduledBg from "@assets/scheduled_1773283819734.jpg";
+import buildDayBg from "@assets/build-day_1773283819734.jpg";
+import projectCompleteBg from "@assets/project-complete_1773283819734.jpg";
 
 const PROCESS_STEPS = [
   { num: "01", title: "Free Inspection", desc: "Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work.", bgImage: inspectionBg },
   { num: "02", title: "Potential Insurance Claim", desc: "If the damage may qualify for insurance coverage, the next step is filing a claim with your insurance company. Your Project Manager will provide the documentation and scope information necessary to support your claim and help guide you through the process.", callout: "In many cases, your Project Manager will meet with your insurance company's representative onsite to review the damage and confirm the scope of work. Once approved, we'll walk through the final scope together.", bgImage: insuranceBg },
   { num: "03", title: "Design Meeting", desc: "Before construction begins, we will hold a design meeting to finalize the details of your project. During this meeting, we will confirm product selections, review construction plans, and address any special considerations or requests you may have for your build day.", bgImage: designMeetingBg },
-  { num: "04", title: "Project Scheduling", desc: "Once selections are finalized, our team will place orders with our suppliers and coordinate with our construction crews. Within approximately 72 hours of your design meeting, we will confirm product availability and provide you with an estimated timeline for your project." },
-  { num: "05", title: "Project Scheduled", desc: "When materials are ready and scheduling is finalized, our team will contact you to confirm your construction dates. Materials will typically be delivered to your driveway prior to the start of construction, and we will confirm the expected start and completion dates with you." },
-  { num: "06", title: "Build Day", desc: "Construction day can be busy, loud, and exciting as your home transformation begins. Your Project Manager will provide a preparation guide beforehand to help minimize inconvenience for you and your family." },
-  { num: "07", title: "Project Completion", desc: "With construction complete, you can enjoy the improved look, protection, and value of your home. You will receive a final paid-in-full invoice for your records, along with any applicable warranty documentation." },
+  { num: "04", title: "Project Scheduling", desc: "Once selections are finalized, our team will place orders with our suppliers and coordinate with our construction crews. Within approximately 72 hours of your design meeting, we will confirm product availability and provide you with an estimated timeline for your project.", bgImage: schedulingBg },
+  { num: "05", title: "Project Scheduled", desc: "When materials are ready and scheduling is finalized, our team will contact you to confirm your construction dates. Materials will typically be delivered to your driveway prior to the start of construction, and we will confirm the expected start and completion dates with you.", bgImage: scheduledBg },
+  { num: "06", title: "Build Day", desc: "Construction day can be busy, loud, and exciting as your home transformation begins. Your Project Manager will provide a preparation guide beforehand to help minimize inconvenience for you and your family.", bgImage: buildDayBg },
+  { num: "07", title: "Project Completion", desc: "With construction complete, you can enjoy the improved look, protection, and value of your home. You will receive a final paid-in-full invoice for your records, along with any applicable warranty documentation.", bgImage: projectCompleteBg },
 ];
 
 const SLIDE_COLORS = [
