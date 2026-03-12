@@ -82,8 +82,8 @@ export function GuidedProcess() {
             >
               {"bgImage" in step && step.bgImage && (
                 <>
-                  <img src={step.bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D2B2E]/90 via-[#0D2B2E]/40 to-transparent" />
+                  <img src={step.bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 50%, transparent 100%)" }} />
                 </>
               )}
               <div className="relative z-10 flex flex-col justify-end h-full px-14 pb-14 pt-16">
@@ -111,8 +111,8 @@ export function GuidedProcess() {
           >
             {"bgImage" in s && s.bgImage && (
               <>
-                <img src={s.bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0D2B2E]/90 via-[#0D2B2E]/40 to-transparent" />
+                <img src={s.bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 50%, transparent 100%)" }} />
               </>
             )}
             <div className="relative z-10 p-6 flex flex-col justify-end flex-1">
