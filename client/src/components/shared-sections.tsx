@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText } from "lucide-react";
-import inspectionBg from "@assets/inspection_1773357403136.jpg";
+import inspectionBg from "@assets/inspection-2_1773360202760.jpg";
 import insuranceBg from "@assets/insurance_1773357403136.jpg";
 import designMeetingBg from "@assets/design-meeting_1773357403136.jpg";
 import schedulingBg from "@assets/scheduling_1773357403137.jpg";
