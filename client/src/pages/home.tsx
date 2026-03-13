@@ -41,7 +41,7 @@ export default function Home() {
       {/* NAV */}
       <nav
         data-testid="nav-main"
-        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 h-[68px] transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 flex items-center px-6 md:px-12 h-[68px] transition-all duration-300 ${
           isNavScrolled ? "bg-[#0A0A0A]/95 backdrop-blur-xl" : "bg-[#0A0A0A]/92 backdrop-blur-lg"
         }`}
         style={{ borderBottom: "1px solid rgba(88,227,234,0.12)" }}
@@ -49,17 +49,17 @@ export default function Home() {
         <button onClick={() => scrollTo("home")} className="flex items-center transition-transform duration-200 hover:scale-110 focus:scale-110 focus:outline-none" data-testid="link-home-logo">
           <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
         </button>
-        <ul className="hidden md:flex items-center gap-9 list-none">
+        <ul className="hidden md:flex items-center gap-9 list-none absolute left-1/2 -translate-x-1/2">
           <li><button onClick={() => scrollTo("about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
           <li><button onClick={() => scrollTo("services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
           <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
         </ul>
         <button
           onClick={() => navigate("/estimate")}
-          className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold tracking-wider uppercase px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+          className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5 ml-auto"
           data-testid="button-nav-estimate"
         >
-          Get Free Estimate
+          Free Estimate
         </button>
       </nav>
       {/* HERO */}
@@ -108,10 +108,10 @@ export default function Home() {
             >
               <button
                 onClick={() => navigate("/estimate")}
-                className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+                className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
                 data-testid="button-hero-estimate"
               >
-                Get Free Estimate
+                Get free estimate
                 <ArrowUpRight size={16} strokeWidth={2.5} />
               </button>
               <button

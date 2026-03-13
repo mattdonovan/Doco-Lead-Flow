@@ -154,7 +154,7 @@ export default function ServicePage() {
             </p>
             <button
               onClick={() => navigate("/estimate")}
-              className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+              className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
               data-testid="button-service-estimate"
             >
               {service.ctaText}

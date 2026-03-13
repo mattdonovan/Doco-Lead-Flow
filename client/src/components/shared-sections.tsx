@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText, CheckCircle2, Search } from "lucide-react";
+import { ALL_CITIES, fuzzyMatchCities } from "@/lib/cities";
 import inspectionBg from "@assets/inspection-2_1773362648618.jpg";
 import insuranceBg from "@assets/insurance-2_1773362648618.jpg";
 import designMeetingBg from "@assets/design-meeting-2_1773362648618.jpg";
@@ -25,10 +26,6 @@ const SLIDE_COLORS = [
   "bg-[#192B28]", "bg-[#1A2030]", "bg-[#1C2820]",
 ];
 
-const CTA_BG_COLORS = [
-  "#0E2233", "#0D2B2E", "#0B2035", "#162830",
-  "#0F1F2B", "#192B28", "#1A2030", "#101E2A",
-];
 
 export function GuidedProcess() {
   const [activeStep, setActiveStep] = useState(0);
@@ -135,24 +132,41 @@ export function GuidedProcess() {
 
 export function CTASection() {
   const [, navigate] = useLocation();
-  const [colorIndex, setColorIndex] = useState(0);
+  const [cityInput, setCityInput] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<{ name: string; type: "service" | "surrounding" } | null>(null);
+  const cityRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setColorIndex((prev) => (prev + 1) % CTA_BG_COLORS.length);
-    }, 6000);
-    return () => clearInterval(interval);
+    function handleClick(e: MouseEvent) {
+      if (cityRef.current && !cityRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  const cityMatches = fuzzyMatchCities(cityInput);
+  const suggestions = cityMatches.exact.length > 0 ? cityMatches.exact : cityMatches.fuzzy;
+  const isFuzzy = cityMatches.exact.length === 0 && cityMatches.fuzzy.length > 0;
+
+  function handleSelect(city: typeof ALL_CITIES[number]) {
+    setSelectedCity(city);
+    setCityInput(city.name);
+    setShowSuggestions(false);
+  }
+
+  function handleContinue() {
+    if (!selectedCity) return;
+    navigate(`/estimate?city=${encodeURIComponent(selectedCity.name)}&cityType=${selectedCity.type}`);
+  }
 
   return (
     <section
       id="contact"
       className="text-white px-8 md:px-20 py-24 grid grid-cols-1 lg:grid-cols-2 items-center gap-16"
-      style={{
-        borderTop: "1px solid rgba(88,227,234,0.1)",
-        backgroundColor: CTA_BG_COLORS[colorIndex],
-        transition: "background-color 4s ease-in-out",
-      }}
+      style={{ borderTop: "1px solid rgba(88,227,234,0.1)", backgroundColor: "#000000" }}
     >
       <div>
         <h2 className="text-[clamp(32px,4vw,56px)] font-black tracking-tighter leading-[1.05]" data-testid="text-cta-headline">
@@ -162,18 +176,114 @@ export function CTASection() {
           Our team personally reviews every request. We'll get back to you within one business day with a straightforward, no-pressure estimate.
         </p>
       </div>
-      <div className="flex flex-col items-start lg:items-center gap-6">
-        <p className="text-white/60 text-base leading-relaxed max-w-md">
-          Start our quick guided process to tell us about your project. It only takes a couple of minutes, and we'll have everything we need to get you a fast, accurate estimate.
-        </p>
-        <button
-          onClick={() => navigate("/estimate")}
-          className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-10 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
-          data-testid="button-cta-estimate"
-        >
-          Start Your Free Estimate
-          <ArrowUpRight size={16} strokeWidth={2.5} />
-        </button>
+
+      <div className="flex flex-col gap-5 max-w-md w-full">
+        <div>
+          <p className="text-white/80 font-semibold text-sm mb-1">Check your service area</p>
+          <p className="text-white/45 text-sm leading-relaxed">
+            Enter your city to confirm we cover your area, then we'll jump straight to your project details.
+          </p>
+        </div>
+
+        <div className="relative" ref={cityRef}>
+          <div className="relative">
+            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Enter your city..."
+              value={cityInput}
+              onChange={e => {
+                setCityInput(e.target.value);
+                setSelectedCity(null);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              className="w-full bg-white/[0.06] border border-white/[0.12] rounded text-white placeholder-white/30 text-sm pl-10 pr-4 py-3 focus:outline-none focus:border-[#58E3EA]/60 transition-colors"
+              data-testid="input-cta-city"
+            />
+          </div>
+
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-[#141414] border border-white/[0.12] rounded overflow-hidden shadow-2xl">
+              {isFuzzy && (
+                <div className="px-4 py-2 text-[11px] text-white/35 font-medium tracking-wide border-b border-white/[0.07]">
+                  Did you mean?
+                </div>
+              )}
+              {suggestions.map(c => (
+                <button
+                  key={c.name}
+                  onClick={() => handleSelect(c)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-white/[0.07] transition-colors"
+                  data-testid={`option-city-${c.name.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  <span className="text-white/85">{c.name}</span>
+                  {c.type === "service" ? (
+                    <span className="text-[10px] font-bold tracking-wider text-[#58E3EA] uppercase">In area</span>
+                  ) : (
+                    <span className="text-[10px] font-bold tracking-wider text-white/30 uppercase">Expanding</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {selectedCity && (
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              {selectedCity.type === "service" ? (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 px-4 py-3 rounded bg-[#58E3EA]/[0.08] border border-[#58E3EA]/20">
+                    <CheckCircle2 size={18} className="text-[#58E3EA] shrink-0" />
+                    <span className="text-sm text-white/80">
+                      <span className="text-white font-semibold">{selectedCity.name}</span> is in our service area!
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleContinue}
+                    className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold px-8 py-3.5 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5 self-start"
+                    data-testid="button-cta-continue"
+                  >
+                    Continue to estimate
+                    <ArrowUpRight size={15} strokeWidth={2.5} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-start gap-3 px-4 py-3 rounded bg-white/[0.04] border border-white/[0.1]">
+                    <MapPin size={16} className="text-white/40 shrink-0 mt-0.5" />
+                    <span className="text-sm text-white/55 leading-relaxed">
+                      We're expanding to <span className="text-white/75 font-medium">{selectedCity.name}</span> soon. You can still submit a request and we'll be in touch when we reach your area.
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleContinue}
+                    className="border border-white/20 text-white/70 text-sm font-semibold px-8 py-3.5 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:border-white/40 hover:text-white self-start"
+                    data-testid="button-cta-continue-surrounding"
+                  >
+                    Continue anyway
+                    <ArrowUpRight size={15} strokeWidth={2.5} />
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        )}
+
+        {!selectedCity && !cityInput && (
+          <button
+            onClick={() => navigate("/estimate")}
+            className="text-white/40 text-sm hover:text-white/65 transition-colors self-start underline underline-offset-4"
+            data-testid="button-cta-skip"
+          >
+            Skip — start the full estimate form
+          </button>
+        )}
       </div>
     </section>
   );
@@ -246,7 +356,7 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
   return (
     <nav
       data-testid="nav-main"
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 h-[68px] bg-[#0A0A0A]/95 backdrop-blur-xl"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center px-6 md:px-12 h-[68px] bg-[#0A0A0A]/95 backdrop-blur-xl"
       style={{ borderBottom: "1px solid rgba(88,227,234,0.12)" }}
     >
       <div className="flex items-center gap-2">
@@ -263,30 +373,20 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
           <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
         </button>
       </div>
-      {variant === "subpage" ? (
-        <button
-          onClick={() => navigate("/estimate")}
-          className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold tracking-wider uppercase px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
-          data-testid="button-nav-estimate"
-        >
-          Get Free Estimate
-        </button>
-      ) : (
-        <>
-          <ul className="hidden md:flex items-center gap-9 list-none">
-            <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
-            <li><button onClick={() => navigate("/#services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
-            <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
-          </ul>
-          <button
-            onClick={() => navigate("/estimate")}
-            className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold tracking-wider uppercase px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
-            data-testid="button-nav-estimate"
-          >
-            Get Free Estimate
-          </button>
-        </>
+      {variant !== "subpage" && (
+        <ul className="hidden md:flex items-center gap-9 list-none absolute left-1/2 -translate-x-1/2">
+          <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
+          <li><button onClick={() => navigate("/#services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
+          <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
+        </ul>
       )}
+      <button
+        onClick={() => navigate("/estimate")}
+        className="bg-[#58E3EA] text-[#0A0A0A] text-[13px] font-bold px-6 py-2.5 rounded cursor-pointer transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5 ml-auto"
+        data-testid="button-nav-estimate"
+      >
+        Free Estimate
+      </button>
     </nav>
   );
 }
