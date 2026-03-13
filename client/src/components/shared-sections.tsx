@@ -176,13 +176,10 @@ export function CTASection() {
           Our team personally reviews every request. We'll get back to you within one business day with a straightforward, no-pressure estimate.
         </p>
       </div>
-
       <div className="flex flex-col gap-5 max-w-md w-full">
         <div>
-          <p className="text-white/80 font-semibold text-sm mb-1">Check your service area</p>
-          <p className="text-white/45 text-sm leading-relaxed">
-            Enter your city to confirm we cover your area, then we'll jump straight to your project details.
-          </p>
+          <p className="text-white/80 font-semibold text-md mb-1">Check your service area</p>
+          <p className="text-white/45 text-sm leading-relaxed">Enter the name of a city in MN</p>
         </div>
 
         <div className="relative" ref={cityRef}>
