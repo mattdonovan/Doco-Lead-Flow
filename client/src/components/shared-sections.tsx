@@ -165,7 +165,7 @@ export function CTASection() {
   return (
     <section
       id="contact"
-      className="text-white px-8 md:px-20 py-24 grid grid-cols-1 lg:grid-cols-2 items-center gap-16 bg-[#0a0a0a]"
+      className="text-white px-8 md:px-20 py-24 grid grid-cols-1 lg:grid-cols-2 items-center gap-16 bg-[#0b0d0e]"
       style={{ borderTop: "1px solid rgba(88,227,234,0.1)", backgroundColor: "#000000" }}
     >
       <div>
