@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText } from "lucide-react";
-import inspectionBg from "@assets/inspection-2_1773360202760.jpg";
-import insuranceBg from "@assets/insurance_1773357403136.jpg";
-import designMeetingBg from "@assets/design-meeting_1773357403136.jpg";
-import schedulingBg from "@assets/scheduling_1773357403137.jpg";
-import scheduledBg from "@assets/scheduled_1773357403136.jpg";
-import buildDayBg from "@assets/build-day_1773357403135.jpg";
-import projectCompleteBg from "@assets/completion_1773357403136.jpg";
+import inspectionBg from "@assets/inspection-2_1773362648618.jpg";
+import insuranceBg from "@assets/insurance-2_1773362648618.jpg";
+import designMeetingBg from "@assets/design-meeting-2_1773362648618.jpg";
+import schedulingBg from "@assets/scheduling_1773362648618.jpg";
+import scheduledBg from "@assets/scheduled_1773362648618.jpg";
+import buildDayBg from "@assets/build-day-2_1773362648617.jpg";
+import projectCompleteBg from "@assets/completion-2_1773362648618.jpg";
 
 const PROCESS_STEPS = [
   { num: "01", title: "Free Inspection", desc: "Your Project Manager will complete a full exterior inspection of your home including 3D imagery when appropriate. After the inspection, we will review any areas of concern with you and provide a clear explanation of our findings along with an estimate for the recommended work.", bgImage: inspectionBg },
