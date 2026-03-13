@@ -272,15 +272,7 @@ export function CTASection() {
           </AnimatePresence>
         )}
 
-        {!selectedCity && !cityInput && (
-          <button
-            onClick={() => navigate("/estimate")}
-            className="text-white/40 text-sm hover:text-white/65 transition-colors self-start underline underline-offset-4"
-            data-testid="button-cta-skip"
-          >
-            Skip — start the full estimate form
-          </button>
-        )}
+
       </div>
     </section>
   );
