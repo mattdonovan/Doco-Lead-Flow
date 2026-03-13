@@ -178,7 +178,7 @@ export function CTASection() {
       </div>
       <div className="flex flex-col gap-5 max-w-md w-full">
         <div>
-          <p className="text-white/80 font-semibold text-md mb-1">Check your service area</p>
+          <p className="text-white/80 font-semibold mb-1 text-[24px]">Check your service area</p>
           <p className="text-white/45 text-sm leading-relaxed">Enter the name of a city in MN</p>
         </div>
 
