@@ -43,21 +43,21 @@ const SIDEBAR_SECTIONS = [
   { label: "Review", icon: ClipboardList },
 ];
 
-const SERVICE_QUESTIONS: Record<string, { q1: { question: string; options: string[] }; q2: { question: string; options: string[] } }> = {
+const SERVICE_QUESTIONS: Record<string, { q1: { question: string; options: string[]; multiSelect?: boolean }; q2: { question: string; options: string[]; multiSelect?: boolean } }> = {
   roofing: {
     q1: { question: "How old is your current roof?", options: ["Under 10 years", "10\u201320 years", "20+ years", "Don't know"] },
-    q2: { question: "What's the situation?", options: ["Active leak or water damage", "Missing or visibly damaged shingles", "Storm or hail damage", "Just aging \u2014 time for a replacement", "Not sure, need an inspection"] },
+    q2: { question: "What's the situation?", options: ["Active leak or water damage", "Missing or visibly damaged shingles", "Storm or hail damage", "Just aging \u2014 time for a replacement", "Not sure, need an inspection"], multiSelect: true },
   },
   siding: {
     q1: { question: "What's your current siding material?", options: ["Vinyl", "Wood", "Fiber cement", "Hardie", "Not sure"] },
-    q2: { question: "What's driving this project?", options: ["Visible damage or rot", "Storm damage", "Just outdated \u2014 ready for an upgrade", "Selling the home soon", "Not sure, need an opinion"] },
+    q2: { question: "What's driving this project?", options: ["Visible damage or rot", "Storm damage", "Just outdated \u2014 ready for an upgrade", "Selling the home soon", "Not sure, need an opinion"], multiSelect: true },
   },
   windows: {
     q1: { question: "Roughly how many windows?", options: ["1 to 3", "4 to 8", "9 or more", "Full house \u2014 not sure on count"] },
-    q2: { question: "What's the main reason?", options: ["Drafty or poor insulation", "Condensation or fogging between panes", "Damaged / won't open or close", "Storm damage", "Just upgrading for curb appeal"] },
+    q2: { question: "What's the main reason (or reasons)?", options: ["Drafty or poor insulation", "Condensation or fogging between panes", "Damaged / won't open or close", "Storm damage", "Just upgrading for curb appeal"], multiSelect: true },
   },
   gutters: {
-    q1: { question: "What's the main issue?", options: ["Overflowing during rain", "Sagging or pulling away", "Visible damage or holes", "I don't have gutters yet", "Full replacement \u2014 they're just old"] },
+    q1: { question: "What's the main reason (or reasons)?", options: ["Overflowing during rain", "Sagging or pulling away", "Visible damage or holes", "I don't have gutters yet", "Full replacement \u2014 they're just old"], multiSelect: true },
     q2: { question: "Do you have gutter guards?", options: ["Yes", "No", "Not sure"] },
   },
 };
@@ -151,7 +151,7 @@ export default function EstimatePage() {
     phone: "",
   });
 
-  const [serviceAnswers, setServiceAnswers] = useState<Record<string, Record<string, string>>>({});
+  const [serviceAnswers, setServiceAnswers] = useState<Record<string, Record<string, string | string[]>>>({});
   const [homeContext, setHomeContext] = useState<string[]>([]);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -335,6 +335,20 @@ export default function EstimatePage() {
     }));
   };
 
+  const toggleMultiAnswer = (service: string, question: string, option: string) => {
+    setServiceAnswers(prev => {
+      const existing = prev[service]?.[question];
+      const current: string[] = Array.isArray(existing) ? existing : [];
+      const next = current.includes(option) ? current.filter(o => o !== option) : [...current, option];
+      return { ...prev, [service]: { ...(prev[service] || {}), [question]: next } };
+    });
+  };
+
+  const isMultiSelected = (service: string, question: string, option: string): boolean => {
+    const val = serviceAnswers[service]?.[question];
+    return Array.isArray(val) ? val.includes(option) : false;
+  };
+
   const toggleContext = (chip: string) => {
     setHomeContext(prev => prev.includes(chip) ? prev.filter(c => c !== chip) : [...prev, chip]);
   };
@@ -424,19 +438,31 @@ export default function EstimatePage() {
                     </div>
                     <div className="flex flex-col gap-2 mb-8">
                       {currentQuestions.q1.options.map(opt => {
-                        const selected = serviceAnswers[currentServiceKey]?.[currentQuestions.q1.question] === opt;
+                        const isMulti = !!currentQuestions.q1.multiSelect;
+                        const selected = isMulti
+                          ? isMultiSelected(currentServiceKey, currentQuestions.q1.question, opt)
+                          : serviceAnswers[currentServiceKey]?.[currentQuestions.q1.question] === opt;
                         return (
                           <button
                             key={opt}
-                            onClick={() => setAnswer(currentServiceKey, currentQuestions.q1.question, opt)}
+                            onClick={() => isMulti
+                              ? toggleMultiAnswer(currentServiceKey, currentQuestions.q1.question, opt)
+                              : setAnswer(currentServiceKey, currentQuestions.q1.question, opt)
+                            }
                             className={`flex items-center gap-4 px-5 py-3.5 rounded-lg border-2 transition-all text-left ${
                               selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
                             }`}
                             data-testid={`button-detail-q1-${opt.toLowerCase().replace(/\s+/g, "-")}`}
                           >
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
-                              {selected && <div className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />}
-                            </div>
+                            {isMulti ? (
+                              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
+                                {selected && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#0A0A0A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                              </div>
+                            ) : (
+                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
+                                {selected && <div className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />}
+                              </div>
+                            )}
                             <span className="text-sm font-medium text-white">{opt}</span>
                           </button>
                         );
@@ -449,19 +475,31 @@ export default function EstimatePage() {
                       </p>
                       <div className="flex flex-col gap-2">
                         {currentQuestions.q2.options.map(opt => {
-                          const selected = serviceAnswers[currentServiceKey]?.[currentQuestions.q2.question] === opt;
+                          const isMulti = !!currentQuestions.q2.multiSelect;
+                          const selected = isMulti
+                            ? isMultiSelected(currentServiceKey, currentQuestions.q2.question, opt)
+                            : serviceAnswers[currentServiceKey]?.[currentQuestions.q2.question] === opt;
                           return (
                             <button
                               key={opt}
-                              onClick={() => setAnswer(currentServiceKey, currentQuestions.q2.question, opt)}
+                              onClick={() => isMulti
+                                ? toggleMultiAnswer(currentServiceKey, currentQuestions.q2.question, opt)
+                                : setAnswer(currentServiceKey, currentQuestions.q2.question, opt)
+                              }
                               className={`flex items-center gap-4 px-5 py-3.5 rounded-lg border-2 transition-all text-left ${
                                 selected ? "border-[#58E3EA] bg-[#58E3EA]/[0.06]" : "border-white/10 bg-white/[0.02] hover:border-white/20"
                               }`}
                               data-testid={`button-detail-q2-${opt.toLowerCase().replace(/\s+/g, "-")}`}
                             >
-                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
-                                {selected && <div className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />}
-                              </div>
+                              {isMulti ? (
+                                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
+                                  {selected && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#0A0A0A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                                </div>
+                              ) : (
+                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${selected ? "border-[#58E3EA] bg-[#58E3EA]" : "border-white/30"}`}>
+                                  {selected && <div className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />}
+                                </div>
+                              )}
                               <span className="text-sm font-medium text-white">{opt}</span>
                             </button>
                           );
