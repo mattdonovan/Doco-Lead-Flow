@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText, CheckCircle2, Search } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText, CheckCircle2, Search, X } from "lucide-react";
 import { ALL_CITIES, fuzzyMatchCities } from "@/lib/cities";
 import inspectionBg from "@assets/inspection-2_1773362648618.jpg";
 import insuranceBg from "@assets/insurance-2_1773362648618.jpg";
@@ -29,7 +29,18 @@ const SLIDE_COLORS = [
 
 export function GuidedProcess() {
   const [activeStep, setActiveStep] = useState(0);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
   const step = PROCESS_STEPS[activeStep];
+
+  const scrollCarouselTo = (index: number) => {
+    if (carouselRef.current) {
+      const child = carouselRef.current.children[index] as HTMLElement;
+      child?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  };
 
   return (
     <section className="bg-[#111111] text-white px-8 md:px-20 py-24">
@@ -99,33 +110,121 @@ export function GuidedProcess() {
         </div>
       </div>
 
-      <div className="md:hidden flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-8 px-8 swipe-carousel">
+      {/* Mobile carousel — square cards, tap to expand */}
+      <div ref={carouselRef} className="md:hidden flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-8 px-8 swipe-carousel">
         {PROCESS_STEPS.map((s, i) => (
           <div
             key={i}
-            className={`relative snap-start shrink-0 w-[80vw] min-h-[320px] rounded-lg overflow-hidden flex flex-col justify-end ${SLIDE_COLORS[i % SLIDE_COLORS.length]}`}
+            className={`relative snap-start shrink-0 w-[78vw] aspect-square rounded-lg overflow-hidden flex flex-col justify-end cursor-pointer ${SLIDE_COLORS[i % SLIDE_COLORS.length]}`}
+            onClick={() => { setExpandedStep(i); }}
             data-testid={`card-process-mobile-${i}`}
           >
             {"bgImage" in s && s.bgImage && (
               <>
                 <img src={s.bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-80" />
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 50%, transparent 100%)" }} />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)" }} />
               </>
             )}
-            <div className="relative z-10 p-6 flex flex-col justify-end flex-1">
-              <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-3">
+            <div className="relative z-10 p-5 flex flex-col justify-end">
+              <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-2">
                 Step {s.num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
               </div>
-              <h3 className="text-xl font-extrabold tracking-tight leading-[1.15] mb-3 text-white">
+              <h3 className="text-lg font-extrabold tracking-tight leading-[1.2] text-white">
                 {s.title}
               </h3>
-              <p className="text-[13px] leading-relaxed text-white/[0.58]">
-                {s.desc}
-              </p>
+              <div className="mt-3 flex items-center gap-1.5 text-[11px] text-white/45 font-medium">
+                <span>Tap to read more</span>
+                <ArrowUpRight size={11} className="text-white/35" />
+              </div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Expanded overlay */}
+      <AnimatePresence>
+        {expandedStep !== null && (
+          <motion.div
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[60] md:hidden"
+            onTouchStart={e => {
+              touchStartX.current = e.touches[0].clientX;
+              touchStartY.current = e.touches[0].clientY;
+            }}
+            onTouchEnd={e => {
+              const dx = e.changedTouches[0].clientX - touchStartX.current;
+              const dy = e.changedTouches[0].clientY - touchStartY.current;
+              if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
+                const next = dx < 0
+                  ? Math.min(expandedStep + 1, PROCESS_STEPS.length - 1)
+                  : Math.max(expandedStep - 1, 0);
+                setExpandedStep(next);
+                scrollCarouselTo(next);
+              } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+                setExpandedStep(null);
+              }
+            }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={expandedStep}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.25 }}
+                className={`relative w-full h-full flex flex-col ${SLIDE_COLORS[expandedStep % SLIDE_COLORS.length]}`}
+              >
+                {"bgImage" in PROCESS_STEPS[expandedStep] && PROCESS_STEPS[expandedStep].bgImage && (
+                  <>
+                    <img src={PROCESS_STEPS[expandedStep].bgImage as string} alt="" className="absolute inset-0 w-full h-full object-cover opacity-75" />
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.25) 100%)" }} />
+                  </>
+                )}
+
+                {/* Top bar */}
+                <div className="relative z-10 flex items-center justify-between px-6 pt-14 pb-4">
+                  <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA]">
+                    Step {PROCESS_STEPS[expandedStep].num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
+                  </div>
+                  <button
+                    onClick={() => setExpandedStep(null)}
+                    className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm"
+                    data-testid="button-process-overlay-close"
+                  >
+                    <X size={16} className="text-white" />
+                  </button>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 flex-1 flex flex-col justify-end px-7 pb-14">
+                  <h3 className="text-[clamp(22px,6vw,32px)] font-extrabold tracking-tight leading-[1.15] mb-5 text-white">
+                    {PROCESS_STEPS[expandedStep].title}
+                  </h3>
+                  <p className="text-[15px] leading-relaxed text-white/70">
+                    {PROCESS_STEPS[expandedStep].desc}
+                  </p>
+
+                  {/* Step dots + swipe hint */}
+                  <div className="flex items-center gap-2 mt-8">
+                    {PROCESS_STEPS.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={e => { e.stopPropagation(); setExpandedStep(i); scrollCarouselTo(i); }}
+                        className={`h-1 rounded-full transition-all ${i === expandedStep ? "w-6 bg-[#58E3EA]" : "w-1.5 bg-white/25"}`}
+                      />
+                    ))}
+                    <span className="ml-auto text-[11px] text-white/30">Swipe or tap to navigate</span>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

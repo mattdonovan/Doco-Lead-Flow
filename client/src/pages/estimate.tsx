@@ -420,7 +420,7 @@ export default function EstimatePage() {
           <motion.div className="h-full bg-[#58E3EA]" animate={{ width: `${((detailStep + 1) / totalDetailSteps) * 100}%` }} transition={{ duration: 0.3 }} />
         </div>
 
-        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 py-8 md:py-16">
+        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 pt-8 pb-[88px] md:py-16">
           <div className="flex-1">
             <AnimatePresence mode="wait">
               <motion.div key={detailStep} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
@@ -584,7 +584,7 @@ export default function EstimatePage() {
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center justify-between pt-6 border-t border-white/[0.06]">
+          <div className="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto bg-[#0A0A0A]/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-white/[0.06] px-6 md:px-0 pt-4 pb-6 md:pt-6 md:pb-0 flex items-center justify-between z-40">
             <button
               onClick={detailStep === 0 ? () => setShowDetailFlow(false) : handleDetailBack}
               className="flex items-center gap-2 text-white/50 text-sm font-medium hover:text-white transition-colors"
@@ -711,7 +711,7 @@ export default function EstimatePage() {
           <motion.div className="h-full bg-[#58E3EA]" initial={{ width: "0%" }} animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }} transition={{ duration: 0.3 }} />
         </div>
 
-        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 py-8 md:py-16">
+        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 pt-8 pb-[88px] md:py-16">
           <div className="flex-1">
             <AnimatePresence mode="wait">
               <motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
@@ -1093,7 +1093,7 @@ export default function EstimatePage() {
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center justify-between pt-6 border-t border-white/[0.06]">
+          <div className="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto bg-[#0A0A0A]/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-white/[0.06] px-6 md:px-0 pt-4 pb-6 md:pt-6 md:pb-0 flex items-center justify-between z-40">
             <button
               onClick={step === 0 ? () => navigate("/") : goBack}
               className="flex items-center gap-2 text-white/50 text-sm font-medium hover:text-white transition-colors"

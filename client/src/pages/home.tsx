@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowUpRight, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { GuidedProcess, CTASection, SiteFooter } from "@/components/shared-sections";
 
 import says_it_all from "@assets/says-it-all.jpg";
@@ -166,18 +166,10 @@ export default function Home() {
       </section>
       {/* SERVICES */}
       <section id="services" className="bg-[#111111] px-8 md:px-20 pt-24 pb-0">
-        <div className="flex items-end justify-between mb-14">
+        <div className="mb-14">
           <h2 className="text-[clamp(28px,3vw,42px)] font-extrabold tracking-tight" data-testid="text-services-headline">Our Services</h2>
-          <div className="hidden sm:flex gap-3">
-            <button className="w-11 h-11 border border-white/20 bg-transparent text-white flex items-center justify-center rounded-sm transition-all hover:bg-[#58E3EA] hover:border-[#58E3EA] hover:text-[#0A0A0A]" data-testid="button-services-prev">
-              <ChevronLeft size={18} strokeWidth={2.5} />
-            </button>
-            <button className="w-11 h-11 border border-white/20 bg-transparent text-white flex items-center justify-center rounded-sm transition-all hover:bg-[#58E3EA] hover:border-[#58E3EA] hover:text-[#0A0A0A]" data-testid="button-services-next">
-              <ChevronRight size={18} strokeWidth={2.5} />
-            </button>
-          </div>
         </div>
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-0.5">
+        <div className="hidden sm:grid sm:grid-cols-2 gap-0.5">
           {[
             { tag: "Roofing", title: "Roof Replacement & Repair", desc: "From storm damage to full replacements, we handle asphalt, metal, and architectural shingles with precision.", img: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png" },
             { tag: "Siding", title: "Siding Installation", desc: "Steel, vinyl, or engineered wood — our siding crews deliver crisp, clean installations that last decades.", img: "https://cdn.midjourney.com/039404f0-2543-4e83-a864-1b8e898f73c1/0_0.png" },
@@ -186,7 +178,7 @@ export default function Home() {
           ].map((svc, i) => (
             <div
               key={i}
-              className="relative overflow-hidden aspect-[3/4] cursor-pointer bg-[#1A1A1A] group"
+              className="relative overflow-hidden aspect-[4/3] cursor-pointer bg-[#1A1A1A] group"
               onClick={() => navigate(SERVICE_LINKS[svc.tag])}
               data-testid={`card-service-${i}`}
             >
