@@ -23,6 +23,14 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
+if (process.env.BASIC_AUTH_PASSWORD) {
+  const expectedAuth = "Basic " + Buffer.from(`doco:${process.env.BASIC_AUTH_PASSWORD}`).toString("base64");
+  app.use((req, res, next) => {
+    if (req.headers.authorization === expectedAuth) return next();
+    res.set("WWW-Authenticate", 'Basic realm="Dev"').status(401).send("Unauthorized");
+  });
+}
+
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
