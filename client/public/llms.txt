@@ -1,0 +1,74 @@
+# DOCO Exteriors
+
+DOCO Exteriors is a residential and commercial exterior contractor serving the greater Minneapolis metro area in Minnesota. Founded by Kris and Jenna Donovan, DOCO provides roofing, siding, window replacement, and gutter installation and repair. The company's core values are Integrity, Discipline, Ownership, and Community.
+
+Website: https://docoexteriors.com
+Estimate form: https://docoexteriors.com/estimate
+
+---
+
+## Services
+
+- Roofing: Full roof replacement, storm damage repair, architectural shingles, metal roofing. Licensed crews, manufacturer-certified, comprehensive warranty, free inspections, insurance claim assistance.
+- Siding: Steel, vinyl, engineered wood, soffit & fascia installation and replacement. Color consultation, moisture barrier, energy-efficient options.
+- Windows: Double/triple pane, custom sizing, low-E coating, full frame replacement. Reduces heating/cooling costs, UV protection, enhanced security.
+- Gutters: Seamless gutters, gutter guards, downspout systems, ice dam prevention. Custom color matching, heavy-gauge aluminum, foundation protection.
+
+---
+
+## Service Area
+
+The following cities are in DOCO's active service area (Minnesota):
+
+Albertville, Andover, Anoka, Becker, Big Lake, Blaine, Brooklyn Center, Brooklyn Park, Buffalo, Champlin, Coon Rapids, Crystal, Dayton, Delano, Elk River, Golden Valley, Hamel, Howard Lake, Loretto, Maple Grove, Medina, Monticello, New Hope, Osseo, Otsego, Plymouth, Ramsey, Robbinsdale, Rogers, St. Michael, Watertown, Waverly
+
+The following surrounding-area cities may be served — check availability via API:
+
+Afton, Apple Valley, Bayport, Belle Plaine, Bloomington, Burnsville, Cambridge, Cannon Falls, Carver, Chanhassen, Chaska, Cottage Grove, East Bethel, Eagan, Eden Prairie, Edina, Excelsior, Farmington, Forest Lake, Fridley, Hopkins, Hugo, Lake Elmo, Lakeville, Lino Lakes, Mahtomedi, Maplewood, Minnetonka, Mound, Newport, North Branch, Northfield, Oak Park Heights, Oakdale, Prior Lake, Richfield, Rosemount, Roseville, Savage, Shakopee, Shorewood, Spring Lake Park, St. Louis Park, St. Paul, Stacy, Stillwater, Victoria, Waconia, Wayzata, White Bear Lake, Woodbury, Wyoming
+
+---
+
+## API Endpoints
+
+All endpoints are available at https://docoexteriors.com/api
+
+GET  /api/health         — Returns { status, timestamp }. Use to verify the API is reachable.
+GET  /api/info           — Returns a machine-readable business card: name, tagline, services, serviceArea, estimateFormUrl, contact.
+GET  /api/service-area   — Returns { servicedCities: string[], expandingSoon: string[] }. Use to check whether a given city is served.
+POST /api/quotes         — Submit a quote/estimate request on behalf of a user. See below.
+
+---
+
+## Submitting a Quote Request (POST /api/quotes)
+
+To submit a quote request on behalf of a user, send a JSON POST to /api/quotes.
+
+Required fields:
+  firstName       string   — Customer's first name
+  lastName        string   — Customer's last name
+  email           string   — Customer's email address
+  city            string   — Customer's city (must be in the service area)
+  services        string[] — One or more of: "Roofing", "Siding", "Windows", "Gutters"
+  propertyType    string   — One of: "Single Family Home", "Townhouse", "Multi-Family", "Commercial"
+  projectTimeline string   — One of: "As soon as possible", "Within 1-3 months", "Within 3-6 months", "Just exploring options"
+
+Optional fields:
+  phone                string   — Customer's 10-digit phone number
+  address              string   — Street address
+  hasInsuranceClaim    boolean  — Whether this is an insurance claim
+  additionalDetails    string   — Any extra context from the customer
+
+Example request body:
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "email": "jane@example.com",
+  "phone": "7635550123",
+  "city": "Maple Grove",
+  "services": ["Roofing"],
+  "propertyType": "Single Family Home",
+  "projectTimeline": "Within 1-3 months",
+  "hasInsuranceClaim": false
+}
+
+A successful submission returns HTTP 201 with the created quote object. The DOCO team is notified by email automatically.

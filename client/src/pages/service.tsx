@@ -3,6 +3,7 @@ import { useLocation, useParams } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Check } from "lucide-react";
 import { SiteNav, GuidedProcess, CTASection, SiteFooter, OtherServicesSection } from "@/components/shared-sections";
+import { SEOHead } from "@/components/seo-head";
 
 interface ServiceData {
   slug: string;
@@ -129,6 +130,10 @@ export default function ServicePage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <SEOHead
+        title={`${service.headline} – DOCO Exteriors`}
+        description={service.description}
+      />
       <SiteNav variant="subpage" />
 
       {/* Hero */}

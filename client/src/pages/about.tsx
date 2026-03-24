@@ -1,8 +1,13 @@
 import { SiteNav, GuidedProcess, CTASection, SiteFooter } from "@/components/shared-sections";
+import { SEOHead } from "@/components/seo-head";
 
 export default function About() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <SEOHead
+        title="About DOCO Exteriors | Minneapolis Exterior Contractors"
+        description="Meet Kris and Jenna Donovan, founders of DOCO Exteriors. We serve the greater Minneapolis metro with roofing, siding, windows, and gutters — built on integrity, discipline, and community."
+      />
       <SiteNav variant="subpage" />
 
       <section className="pt-[68px] bg-[#0A0A0A]">

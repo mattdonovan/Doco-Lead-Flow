@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { GuidedProcess, CTASection, SiteFooter } from "@/components/shared-sections";
+import { SEOHead } from "@/components/seo-head";
 
 import says_it_all from "@assets/says-it-all.jpg";
 
@@ -38,6 +39,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <SEOHead
+        title="DOCO Exteriors – Minneapolis Roofing, Siding, Windows & Gutters"
+        description="DOCO Exteriors provides superior roofing, siding, windows, and gutters across the greater Minneapolis metro. Get a free estimate today."
+      />
       {/* NAV */}
       <nav
         data-testid="nav-main"

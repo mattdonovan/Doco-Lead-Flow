@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertQuoteRequestSchema } from "@shared/schema";
+import { SERVICE_AREA, SURROUNDING_AREA } from "@shared/cities";
 import { Resend } from "resend";
 import { z } from "zod";
 
@@ -262,6 +263,25 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  app.get("/api/health", (_req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  app.get("/api/info", (_req, res) => {
+    res.json({
+      name: "DOCO Exteriors",
+      tagline: "Protecting Homes, Exceeding Expectations",
+      services: ["Roofing", "Siding", "Windows", "Gutters"],
+      serviceArea: SERVICE_AREA,
+      estimateFormUrl: "https://docoexteriors.com/estimate",
+      contact: { email: "iam.mattdonovan@gmail.com" },
+    });
+  });
+
+  app.get("/api/service-area", (_req, res) => {
+    res.json({ servicedCities: SERVICE_AREA, expandingSoon: SURROUNDING_AREA });
+  });
+
   app.post("/api/quotes", async (req, res) => {
     try {
       const parsed = insertQuoteRequestSchema.safeParse(req.body);

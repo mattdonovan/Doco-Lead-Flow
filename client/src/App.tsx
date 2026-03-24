@@ -9,6 +9,7 @@ import Home from "@/pages/home";
 import EstimatePage from "@/pages/estimate";
 import About from "@/pages/about";
 import ServicePage from "@/pages/service";
+import { SEOHead } from "@/components/seo-head";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -39,6 +40,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <SEOHead />
         <Toaster />
         <Router />
       </TooltipProvider>
