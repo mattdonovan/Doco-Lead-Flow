@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
+import ComingSoon from "@/pages/coming-soon";
 import EstimatePage from "@/pages/estimate";
 import About from "@/pages/about";
 import ServicePage from "@/pages/service";
@@ -26,7 +27,7 @@ function Router() {
     <>
       <ScrollToTop />
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={ComingSoon} />
         <Route path="/estimate" component={EstimatePage} />
         <Route path="/about" component={About} />
         <Route path="/services/:slug" component={ServicePage} />
