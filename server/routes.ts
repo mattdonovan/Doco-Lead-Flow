@@ -146,7 +146,7 @@ async function sendNotifyEmail(email: string, city: string) {
 }
 
 const updateDetailsSchema = z.object({
-  serviceDetails: z.record(z.record(z.string())).optional(),
+  serviceDetails: z.record(z.record(z.union([z.string(), z.array(z.string())]))).optional(),
   homeContext: z.array(z.string()).optional(),
   photoUrl: z.string().optional(),
   selectedOfferings: z.array(z.string()).optional(),
