@@ -129,6 +129,40 @@ interface FormData {
   phone: string;
 }
 
+function BookingScreen({ onHome }: { onHome: () => void }) {
+  useEffect(() => {
+    if (document.querySelector('script[src*="calendly"]')) return;
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center justify-center p-8" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="w-full max-w-2xl">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">Want to schedule a time?</h1>
+          <p className="text-white/60 text-base">Pick a time that works for you and we'll reach out to confirm.</p>
+        </div>
+        <div
+          className="calendly-inline-widget rounded-lg overflow-hidden"
+          data-url="https://calendly.com/iam-mattdonovan/30min?hide_event_type_details=1&hide_gdpr_banner=1&background_color=293545&text_color=ffffff&primary_color=58e3ea"
+          style={{ minWidth: "320px", height: "700px" }}
+        />
+        <div className="text-center mt-6">
+          <button
+            onClick={onHome}
+            className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+          >
+            No thanks, take me home
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function EstimatePage() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -374,26 +408,7 @@ export default function EstimatePage() {
   const TOTAL_STEPS = 4;
 
   if (showBooking) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center justify-center p-8" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="w-full max-w-2xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">Want to schedule a time?</h1>
-            <p className="text-white/60 text-base">Pick a time that works for you and we'll reach out to confirm.</p>
-          </div>
-          <div className="calendly-inline-widget rounded-lg overflow-hidden" data-url="https://calendly.com/iam-mattdonovan/30min?hide_event_type_details=1&hide_gdpr_banner=1&background_color=293545&text_color=ffffff&primary_color=58e3ea" style={{ minWidth: "320px", height: "700px" }} />
-          <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async />
-          <div className="text-center mt-6">
-            <button
-              onClick={() => navigate("/")}
-              className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
-            >
-              No thanks, take me home
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    );
+    return <BookingScreen onHome={() => navigate("/")} />;
   }
 
   if (detailsSubmitted) {
