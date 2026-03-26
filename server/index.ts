@@ -31,6 +31,17 @@ if (process.env.BASIC_AUTH_PASSWORD) {
   });
 }
 
+// Prevent indexing on non-production environments
+if (process.env.NODE_ENV !== "production") {
+  app.use((_req, res, next) => {
+    res.set("X-Robots-Tag", "noindex, nofollow");
+    next();
+  });
+  app.get("/robots.txt", (_req, res) => {
+    res.type("text/plain").send("User-agent: *\nDisallow: /\n");
+  });
+}
+
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
