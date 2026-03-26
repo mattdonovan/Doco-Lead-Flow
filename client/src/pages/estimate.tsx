@@ -916,7 +916,7 @@ export default function EstimatePage() {
                 </h1>
               </div>
               <p className="text-white/60 text-base leading-relaxed mb-3">
-                Our team will personally review your request and get back to you within one business day with a straightforward, no-pressure estimate.
+                Our team will personally review your request and get back to you within one business day to confirm the details.
               </p>
               <p className="text-white/40 text-sm mb-8">
                 We've sent a confirmation to <span className="text-[#58E3EA]">{formData.email}</span>
