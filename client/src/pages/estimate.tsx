@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
+import Cal from "@calcom/embed-react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, Check, Home, Wrench, ChevronLeft, MapPin, ClipboardList, Bell, ChevronDown, Upload, Camera, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, Home, Wrench, ChevronLeft, MapPin, ClipboardList, Bell } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { InsertQuoteRequest } from "@shared/schema";
-import { ALL_CITIES, fuzzyMatchCities } from "@/lib/cities";
+import { fuzzyMatchCities } from "@/lib/cities";
 
 const SERVICE_IMAGES: Record<string, string> = {
   roofing: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png",
@@ -79,6 +80,13 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function parseName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/);
+  const firstName = parts[0] || "";
+  const lastName = parts.slice(1).join(" ") || "";
+  return { firstName, lastName };
+}
+
 function isValidPhone(phone: string): boolean {
   if (!phone.trim()) return true;
   return phone.replace(/\D/g, "").length === 10;
@@ -129,33 +137,208 @@ interface FormData {
   phone: string;
 }
 
-function BookingScreen({ onHome }: { onHome: () => void }) {
+interface BookingDetails {
+  uid: string;
+  startTime: string;
+  endTime?: string;
+  location?: string;
+  timezone?: string;
+}
+
+function formatBookingDate(iso: string, tz?: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    weekday: "long", month: "long", day: "numeric", year: "numeric",
+    timeZone: tz,
+  });
+}
+
+function formatBookingTime(startIso: string, endIso?: string, tz?: string): string {
+  const opts: Intl.DateTimeFormatOptions = { hour: "numeric", minute: "2-digit", timeZoneName: "short", timeZone: tz };
+  const start = new Date(startIso).toLocaleTimeString("en-US", opts);
+  if (!endIso) return start;
+  const endOpts: Intl.DateTimeFormatOptions = { hour: "numeric", minute: "2-digit", timeZone: tz };
+  const end = new Date(endIso).toLocaleTimeString("en-US", endOpts);
+  return `${start.replace(/ [A-Z]{2,4}$/, "")} – ${end}${start.match(/ [A-Z]{2,4}$/)?.[0] ?? ""}`;
+}
+
+function buildGoogleCalUrl(d: BookingDetails): string {
+  const fmt = (iso: string) => new Date(iso).toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+  const end = d.endTime ?? new Date(new Date(d.startTime).getTime() + 3600000).toISOString();
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "Estimate Visit with DOCO Exteriors",
+    dates: `${fmt(d.startTime)}/${fmt(end)}`,
+    details: "Your estimate visit with DOCO Exteriors is confirmed.",
+    ...(d.location ? { location: d.location } : {}),
+  });
+  return `https://calendar.google.com/calendar/render?${params}`;
+}
+
+function buildICSUrl(d: BookingDetails): string {
+  const fmt = (iso: string) => new Date(iso).toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
+  const end = d.endTime ?? new Date(new Date(d.startTime).getTime() + 3600000).toISOString();
+  const ics = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DOCO Exteriors//EN",
+    "BEGIN:VEVENT",
+    `UID:${d.uid}@docoexteriors.com`,
+    `DTSTART:${fmt(d.startTime)}`,
+    `DTEND:${fmt(end)}`,
+    "SUMMARY:Estimate Visit with DOCO Exteriors",
+    d.location ? `LOCATION:${d.location}` : "",
+    "END:VEVENT", "END:VCALENDAR",
+  ].filter(Boolean).join("\r\n");
+  return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
+}
+
+function buildBookingNotes(
+  formData: FormData,
+  serviceAnswers: Record<string, Record<string, string | string[]>>,
+  homeContext: string[],
+): string {
+  const { firstName, lastName } = parseName(formData.fullName);
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  const serviceLabels = SERVICES.filter(s => formData.services.includes(s.id)).map(s => s.label);
+  const propertyLabel = PROPERTY_TYPES.find(p => p.id === formData.propertyType)?.label ?? "";
+  const timelineLabel = TIMELINES.find(t => t.id === formData.projectTimeline)?.label ?? "";
+
+  const lines: string[] = [];
+
+  lines.push(`${fullName} is requesting an estimate for:`);
+  serviceLabels.forEach(l => lines.push(`  • ${l}`));
+  lines.push("");
+
+  lines.push(`Property: ${propertyLabel} in ${formData.city}, MN`);
+  lines.push(`Timeline: ${timelineLabel}`);
+  if (formData.hasInsuranceClaim !== null) {
+    lines.push(`Insurance claim: ${formData.hasInsuranceClaim ? "Yes" : "No"}`);
+  }
+  if (formData.phone) {
+    lines.push(`Phone: ${formData.phone}`);
+  }
+
+  const serviceEntries = Object.entries(serviceAnswers);
+  if (serviceEntries.length > 0) {
+    lines.push("");
+    lines.push("Project details:");
+    serviceEntries.forEach(([svcId, answers]) => {
+      const svcLabel = SERVICES.find(s => s.id === svcId)?.label ?? svcId;
+      lines.push(`  ${svcLabel}:`);
+      Object.entries(answers).forEach(([q, a]) => {
+        const answer = Array.isArray(a) ? a.join(", ") : a;
+        lines.push(`    ${q}: ${answer}`);
+      });
+    });
+  }
+
+  if (homeContext.length > 0) {
+    lines.push("");
+    lines.push("Additional context:");
+    homeContext.forEach(chip => lines.push(`  • ${chip}`));
+  }
+
+  return lines.join("\n");
+}
+
+function BookingScreen({
+  formData,
+  serviceAnswers,
+  homeContext,
+  onBack,
+  onBookingComplete,
+}: {
+  formData: FormData;
+  serviceAnswers: Record<string, Record<string, string | string[]>>;
+  homeContext: string[];
+  onBack: () => void;
+  onBookingComplete: (details?: BookingDetails) => void;
+}) {
+  const [calError, setCalError] = useState(false);
+
   useEffect(() => {
-    if (document.querySelector('script[src*="calendly"]')) return;
-    const script = document.createElement("script");
-    script.src = "https://assets.calendly.com/assets/external/widget.js";
-    script.async = true;
-    document.head.appendChild(script);
-  }, []);
+    (async function () {
+      try {
+        const { getCalApi } = await import("@calcom/embed-react");
+        const cal = await getCalApi({ namespace: "estimate-visit" });
+        cal("ui", {
+          theme: "dark",
+          cssVarsPerTheme: {
+            light: { "cal-brand": "#58E3EA" },
+            dark: { "cal-brand": "#58E3EA" },
+          },
+          hideEventTypeDetails: true,
+          layout: "month_view",
+        });
+        cal("on", {
+          action: "bookingSuccessful",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          callback: (e: any) => {
+            const b = e?.detail?.data?.booking ?? e?.data?.booking ?? e?.booking ?? {};
+            onBookingComplete({
+              uid: b.uid ?? "",
+              startTime: b.startTime ?? "",
+              endTime: b.endTime,
+              location: b.location || undefined,
+              timezone: b.attendees?.[0]?.timeZone ?? b.organizer?.timeZone,
+            });
+          },
+        });
+        cal("on", {
+          action: "linkFailed",
+          callback: () => setCalError(true),
+        });
+      } catch {
+        setCalError(true);
+      }
+    })();
+  }, [onBookingComplete]);
+
+  const notes = buildBookingNotes(formData, serviceAnswers, homeContext);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center justify-center p-8" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="w-full max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">Want to schedule a time?</h1>
-          <p className="text-white/60 text-base">Pick a time that works for you and we'll reach out to confirm.</p>
+    <div className="min-h-screen bg-[#0A0A0A] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <div className="text-center pt-20 pb-6 px-8">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">Schedule your estimate</h1>
+          <p className="text-white/50 text-base">Pick a time that works for you</p>
         </div>
-        <div
-          className="calendly-inline-widget rounded-lg overflow-hidden"
-          data-url="https://calendly.com/iam-mattdonovan/30min?hide_event_type_details=1&hide_gdpr_banner=1&background_color=293545&text_color=ffffff&primary_color=58e3ea"
-          style={{ minWidth: "320px", height: "700px" }}
-        />
-        <div className="text-center mt-6">
+        {calError ? (
+          <div className="max-w-md mx-auto px-6 py-12 text-center">
+            <div className="bg-white/[0.04] border border-white/10 rounded-lg p-8 mb-6">
+              <p className="text-white/70 text-sm leading-relaxed mb-4">
+                The booking calendar couldn't load. You can schedule directly at the link below, or our team will reach out within one business day.
+              </p>
+              <a
+                href="https://cal.com/matt-donovan-uztzdy/estimate-visit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-6 py-3 rounded transition-all hover:bg-[#3ABFC6]"
+              >
+                Open Booking Page
+                <ArrowUpRight size={14} strokeWidth={2.5} />
+              </a>
+            </div>
+          </div>
+        ) : (
+          <Cal
+            namespace="estimate-visit"
+            calLink="matt-donovan-uztzdy/estimate-visit"
+            style={{ width: "100%", minHeight: "600px" }}
+            config={{
+              layout: "month_view",
+              useSlotsViewOnSmallScreen: "true",
+              theme: "dark",
+              name: formData.fullName,
+              email: formData.email,
+              notes,
+            }}
+          />
+        )}
+        <div className="text-center py-6">
           <button
-            onClick={onHome}
+            onClick={onBack}
             className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
           >
-            No thanks, take me home
+            ← Back
           </button>
         </div>
       </motion.div>
@@ -173,6 +356,9 @@ export default function EstimatePage() {
   const [detailStep, setDetailStep] = useState(0);
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [bookingCompleted, setBookingCompleted] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState<BookingDetails | undefined>();
 
   const [formData, setFormData] = useState<FormData>({
     city: "",
@@ -188,22 +374,19 @@ export default function EstimatePage() {
 
   const [serviceAnswers, setServiceAnswers] = useState<Record<string, Record<string, string | string[]>>>({});
   const [homeContext, setHomeContext] = useState<string[]>([]);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const [cityInput, setCityInput] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [surroundingPrompt, setSurroundingPrompt] = useState(false);
+  const [surroundingAcknowledged, setSurroundingAcknowledged] = useState(false);
   const [notifyMode, setNotifyMode] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState("");
   const [notifySubmitted, setNotifySubmitted] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
-  const [reviewExpanded, setReviewExpanded] = useState(false);
 
   const cityRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -226,6 +409,30 @@ export default function EstimatePage() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  useEffect(() => {
+    if (step === 2 && formData.projectTimeline) {
+      const t = setTimeout(() => setStep(3), 200);
+      return () => clearTimeout(t);
+    }
+  }, [formData.projectTimeline]);
+
+  useEffect(() => {
+    const slugs = ["location", "project", "details", "contact"];
+    window.history.replaceState(null, '', `#${slugs[step] ?? "contact"}`);
+  }, [step]);
+
+  useEffect(() => {
+    if (submitted) window.history.replaceState(null, '', '#success');
+  }, [submitted]);
+
+  useEffect(() => {
+    if (showBooking) window.history.replaceState(null, '', '#booking');
+  }, [showBooking]);
+
+  useEffect(() => {
+    if (showSummary) window.history.replaceState(null, '', '#summary');
+  }, [showSummary]);
+
   const cityMatches = fuzzyMatchCities(cityInput);
   const filteredCities = cityMatches.exact;
   const fuzzyCities = cityMatches.fuzzy;
@@ -234,19 +441,15 @@ export default function EstimatePage() {
     setCityInput(city.name);
     setFormData(prev => ({ ...prev, city: city.name, cityType: city.type }));
     setShowSuggestions(false);
+    setSurroundingAcknowledged(false);
     if (city.type === "surrounding") {
       setSurroundingPrompt(true);
     } else {
       setSurroundingPrompt(false);
     }
+    setStep(1);
   };
 
-  const parseName = (fullName: string) => {
-    const parts = fullName.trim().split(/\s+/);
-    const firstName = parts[0] || "";
-    const lastName = parts.slice(1).join(" ") || "";
-    return { firstName, lastName };
-  };
 
   const submitMutation = useMutation({
     mutationFn: async (data: InsertQuoteRequest) => {
@@ -269,6 +472,7 @@ export default function EstimatePage() {
     },
     onSuccess: () => {
       setDetailsSubmitted(true);
+      setShowDetailFlow(false);
     },
     onError: () => {
       toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
@@ -296,8 +500,9 @@ export default function EstimatePage() {
   const canProceed = (): boolean => {
     switch (step) {
       case 0:
-        return formData.city !== "" && formData.cityType !== null && !surroundingPrompt;
+        return formData.city !== "" && formData.cityType !== null;
       case 1:
+        if (surroundingPrompt && !surroundingAcknowledged && !notifySubmitted) return false;
         return formData.propertyType !== "" && formData.services.length > 0;
       case 2:
         return formData.projectTimeline !== "";
@@ -345,16 +550,15 @@ export default function EstimatePage() {
   };
 
   const activeServiceKeys = formData.services.filter(s => SERVICE_QUESTIONS[s]);
-  const totalDetailSteps = activeServiceKeys.length + 2;
+  const totalDetailSteps = activeServiceKeys.length + 1;
 
   const handleDetailNext = () => {
     if (detailStep < totalDetailSteps - 1) {
       setDetailStep(prev => prev + 1);
     } else {
       detailMutation.mutate({
-        serviceDetails: serviceAnswers,
+        serviceDetails: serviceAnswers as Record<string, Record<string, string>>,
         homeContext: homeContext.length > 0 ? homeContext : undefined,
-        photoUrl: photoPreview || undefined,
       });
     }
   };
@@ -388,16 +592,6 @@ export default function EstimatePage() {
     setHomeContext(prev => prev.includes(chip) ? prev.filter(c => c !== chip) : [...prev, chip]);
   };
 
-  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPhotoFile(file);
-      const reader = new FileReader();
-      reader.onload = () => setPhotoPreview(reader.result as string);
-      reader.readAsDataURL(file);
-    }
-  };
-
   const QUESTIONS = [
     "What city is your property in?",
     "Tell us about your project.",
@@ -407,42 +601,12 @@ export default function EstimatePage() {
 
   const TOTAL_STEPS = 4;
 
-  if (showBooking) {
-    return <BookingScreen onHome={() => navigate("/")} />;
-  }
-
-  if (detailsSubmitted) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center p-8" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-center max-w-lg">
-          <div className="w-20 h-20 rounded-full bg-[#58E3EA]/20 flex items-center justify-center mx-auto mb-8">
-            <Check size={40} className="text-[#58E3EA]" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4" data-testid="text-details-complete-headline">
-            Thanks for the extra details!
-          </h1>
-          <p className="text-white/60 text-base leading-relaxed mb-10">
-            This helps us prepare for your estimate visit. Our team will be in touch within one business day.
-          </p>
-          <button
-            onClick={() => setShowBooking(true)}
-            className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
-            data-testid="button-details-complete-home"
-          >
-            Schedule an Appointment
-            <ArrowUpRight size={16} strokeWidth={2.5} />
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
 
   if (showDetailFlow) {
     const currentServiceKey = detailStep < activeServiceKeys.length ? activeServiceKeys[detailStep] : null;
     const currentServiceLabel = currentServiceKey ? SERVICES.find(s => s.id === currentServiceKey)?.label : null;
     const currentQuestions = currentServiceKey ? SERVICE_QUESTIONS[currentServiceKey] : null;
     const isContextStep = detailStep === activeServiceKeys.length;
-    const isPhotoStep = detailStep === activeServiceKeys.length + 1;
 
     return (
       <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -459,8 +623,8 @@ export default function EstimatePage() {
           <motion.div className="h-full bg-[#58E3EA]" animate={{ width: `${((detailStep + 1) / totalDetailSteps) * 100}%` }} transition={{ duration: 0.3 }} />
         </div>
 
-        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 pt-8 pb-[88px] md:py-16">
-          <div className="flex-1">
+        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 pt-8 md:py-16 lg:block lg:pt-12">
+          <div className="flex-1 lg:flex-none">
             <AnimatePresence mode="wait">
               <motion.div key={detailStep} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
 
@@ -581,49 +745,11 @@ export default function EstimatePage() {
                   </div>
                 )}
 
-                {isPhotoStep && (
-                  <div>
-                    <div className="flex items-start gap-3 mb-8">
-                      <DocoAvatar />
-                      <p className="text-lg md:text-xl font-semibold text-white leading-snug" data-testid="text-photo-question">
-                        Got a photo? Totally optional.
-                      </p>
-                    </div>
-                    <p className="text-sm text-white/50 mb-6 leading-relaxed">
-                      A photo of the damage, the area, or even just the front of your house is plenty.
-                    </p>
-                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoSelect} data-testid="input-photo-file" />
-                    {!photoPreview ? (
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-full border-2 border-dashed border-white/20 rounded-lg py-12 flex flex-col items-center gap-3 transition-all hover:border-[#58E3EA]/40 hover:bg-[#58E3EA]/[0.02]"
-                        data-testid="button-upload-photo"
-                      >
-                        <div className="w-14 h-14 rounded-full bg-white/[0.06] flex items-center justify-center">
-                          <Camera size={24} className="text-white/40" />
-                        </div>
-                        <span className="text-sm font-medium text-white/50">Tap to upload a photo</span>
-                        <span className="text-[11px] text-white/30">JPG, PNG, or HEIC</span>
-                      </button>
-                    ) : (
-                      <div className="relative rounded-lg overflow-hidden">
-                        <img src={photoPreview} alt="Uploaded" className="w-full max-h-[300px] object-cover rounded-lg" />
-                        <button
-                          onClick={() => { setPhotoFile(null); setPhotoPreview(null); }}
-                          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
-                          data-testid="button-remove-photo"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          <div className="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto bg-[#0A0A0A]/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-white/[0.06] px-6 md:px-0 pt-4 pb-6 md:pt-6 md:pb-0 flex items-center justify-between z-40">
+          <div className="sticky bottom-0 bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-white/[0.06] px-8 md:px-0 pt-4 pb-8 md:pt-6 md:pb-0 lg:mt-8 flex items-center justify-between z-40" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
             <button
               onClick={detailStep === 0 ? () => setShowDetailFlow(false) : handleDetailBack}
               className="flex items-center gap-2 text-white/50 text-sm font-medium hover:text-white transition-colors"
@@ -655,45 +781,317 @@ export default function EstimatePage() {
     );
   }
 
+  if (submitted && showSummary) {
+    const { firstName } = parseName(formData.fullName);
+    const serviceEntries = Object.entries(serviceAnswers);
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+        <div className="max-w-5xl mx-auto px-6 md:px-12 pt-16 pb-16">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-start">
+            <div className="mb-10 lg:mb-0 lg:sticky lg:top-16">
+              <div className="w-16 h-16 rounded-full bg-[#58E3EA]/20 flex items-center justify-center mb-6">
+                <Check size={28} className="text-[#58E3EA]" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-3">No problem, {firstName}.</h1>
+              <p className="text-white/60 text-base leading-relaxed mb-2">
+                Our team will personally review your request and reach out within one business day to find a time that works for you.
+              </p>
+              <p className="text-white/40 text-sm mb-8">Confirmation sent to <span className="text-[#58E3EA]">{formData.email}</span></p>
+              <button
+                onClick={() => navigate("/")}
+                className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+              >
+                Back to Home
+              </button>
+            </div>
+
+            <div>
+              <div className="bg-white/[0.03] border border-white/10 rounded-lg mb-4 overflow-hidden">
+                <div className="p-5 border-b border-white/[0.06]">
+                  <div className="flex items-center gap-3 mb-3">
+                    <MapPin size={14} className="text-[#58E3EA]" />
+                    <span className="text-sm font-semibold text-white">{formData.city}, MN</span>
+                    {formData.cityType === "surrounding" && (
+                      <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded">Expanding Soon</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Home size={14} className="text-[#58E3EA]" />
+                    <span className="text-sm text-white/70">{PROPERTY_TYPES.find(p => p.id === formData.propertyType)?.label}</span>
+                  </div>
+                </div>
+                <div className="p-5 border-b border-white/[0.06]">
+                  <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Services</p>
+                  <div className="flex gap-3 flex-wrap">
+                    {formData.services.map(svcId => {
+                      const svc = SERVICES.find(s => s.id === svcId);
+                      return (
+                        <div key={svcId} className="relative w-[100px] h-[70px] rounded overflow-hidden">
+                          <img src={SERVICE_IMAGES[svcId]} alt={svc?.label} className="w-full h-full object-cover opacity-60" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                          <span className="absolute bottom-2 left-2 text-[11px] font-bold text-white">{svc?.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="grid grid-cols-2 gap-y-3 text-sm">
+                    <div>
+                      <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Insurance</span>
+                      <p className="text-white/80 mt-0.5">{formData.hasInsuranceClaim === true ? "Yes" : formData.hasInsuranceClaim === false ? "No" : "Not specified"}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Timeline</span>
+                      <p className="text-white/80 mt-0.5">{TIMELINES.find(t => t.id === formData.projectTimeline)?.label}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {serviceEntries.length > 0 && (
+                <div className="bg-white/[0.03] border border-white/10 rounded-lg mb-4 overflow-hidden">
+                  {serviceEntries.map(([svcId, answers]) => {
+                    const svc = SERVICES.find(s => s.id === svcId);
+                    return (
+                      <div key={svcId} className="p-5 border-b border-white/[0.06] last:border-b-0">
+                        <p className="text-[10px] font-extrabold tracking-widest uppercase text-[#58E3EA] mb-3">{svc?.label}</p>
+                        {Object.entries(answers).map(([q, a]) => (
+                          <div key={q} className="mb-2 last:mb-0">
+                            <span className="text-[11px] text-white/40">{q}</span>
+                            <p className="text-sm text-white/80">{Array.isArray(a) ? a.join(", ") : a}</p>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {homeContext.length > 0 && (
+                <div className="bg-white/[0.03] border border-white/10 rounded-lg p-5">
+                  <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Additional Context</p>
+                  <div className="flex flex-wrap gap-2">
+                    {homeContext.map(chip => (
+                      <span key={chip} className="text-[12px] font-medium px-3 py-1.5 rounded-lg text-[#58E3EA] bg-[#58E3EA]/10 border border-[#58E3EA]/30">{chip}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  if (submitted && showBooking) {
+    return (
+      <BookingScreen
+        formData={formData}
+        serviceAnswers={serviceAnswers}
+        homeContext={homeContext}
+        onBack={() => setShowBooking(false)}
+        onBookingComplete={(details) => { setBookingCompleted(true); setBookingDetails(details); setShowBooking(false); }}
+      />
+    );
+  }
+
   if (submitted) {
     const { firstName } = parseName(formData.fullName);
+    const serviceEntries = Object.entries(serviceAnswers);
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center p-8" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="text-center max-w-lg">
-          <div className="w-20 h-20 rounded-full bg-[#58E3EA]/20 flex items-center justify-center mx-auto mb-8">
-            <Check size={40} className="text-[#58E3EA]" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4" data-testid="text-success-headline">
-            You're all set, {firstName}!
-          </h1>
-          <p className="text-white/60 text-base leading-relaxed mb-3">
-            Our team will personally review your request and get back to you within one business day with a straightforward, no-pressure estimate.
-          </p>
-          <p className="text-white/40 text-sm mb-10">
-            We've sent a confirmation to <span className="text-[#58E3EA]">{formData.email}</span>
-          </p>
-          <div className="flex flex-col gap-4 items-center">
-            <button
-              onClick={() => {
-                setShowDetailFlow(true);
-                setDetailStep(0);
-              }}
-              className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
-              data-testid="button-add-details"
-            >
-              Add More Details
-              <ArrowUpRight size={16} strokeWidth={2.5} />
-            </button>
-            <p className="text-white/40 text-[13px] mb-2">Help us prepare for your estimate visit with a few optional questions.</p>
-            <button
-              onClick={() => setShowBooking(true)}
-              className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
-              data-testid="button-success-home"
-            >
-              Skip, just schedule a time
-            </button>
-          </div>
-        </motion.div>
+      <div className="min-h-screen bg-[#0A0A0A] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+        <div className="max-w-5xl mx-auto px-6 md:px-12 pt-16 pb-16">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="lg:grid lg:grid-cols-2 lg:gap-16 lg:items-start">
+            <div className="text-center lg:text-left mb-10 lg:mb-0 lg:sticky lg:top-16">
+              <div className="flex items-center gap-3 mb-4 justify-center lg:justify-start">
+                <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.35, type: "spring", stiffness: 320, damping: 22 }}>
+                  <div className="w-9 h-9 rounded-full bg-[#58E3EA] flex items-center justify-center shrink-0">
+                    <Check size={18} strokeWidth={3} className="text-[#0A0A0A]" />
+                  </div>
+                </motion.div>
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+                  You're all set, {firstName}!
+                </h1>
+              </div>
+              <p className="text-white/60 text-base leading-relaxed mb-3">
+                Our team will personally review your request and get back to you within one business day with a straightforward, no-pressure estimate.
+              </p>
+              <p className="text-white/40 text-sm mb-8">
+                We've sent a confirmation to <span className="text-[#58E3EA]">{formData.email}</span>
+              </p>
+              <div className="flex flex-col gap-4 items-center lg:items-start">
+                {!detailsSubmitted && (
+                  <button
+                    onClick={() => { setShowDetailFlow(true); setDetailStep(0); }}
+                    className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+                  >
+                    Add More Details
+                    <ArrowUpRight size={16} strokeWidth={2.5} />
+                  </button>
+                )}
+                {bookingCompleted ? (
+                  <div className="flex flex-col gap-4 items-center lg:items-start w-full">
+                    <div className="inline-flex items-center gap-2.5 text-[#58E3EA] text-sm font-bold tracking-wider uppercase">
+                      <Check size={16} strokeWidth={2.5} />
+                      Estimate Scheduled
+                    </div>
+
+                    {bookingDetails?.startTime && (
+                      <div className="w-full bg-white/[0.03] border border-white/10 rounded-lg overflow-hidden text-left">
+                        <div className="px-5 py-4 border-b border-white/[0.06]">
+                          <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-1">When</p>
+                          <p className="text-sm font-semibold text-white">{formatBookingDate(bookingDetails.startTime, bookingDetails.timezone)}</p>
+                          <p className="text-sm text-white/60">{formatBookingTime(bookingDetails.startTime, bookingDetails.endTime, bookingDetails.timezone)}</p>
+                        </div>
+                        {bookingDetails.location && (
+                          <div className="px-5 py-4 border-b border-white/[0.06]">
+                            <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-1">Where</p>
+                            <p className="text-sm text-white/70">{bookingDetails.location}</p>
+                          </div>
+                        )}
+                        <div className="px-5 py-4 border-b border-white/[0.06]">
+                          <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-2">Add to calendar</p>
+                          <div className="flex gap-3 flex-wrap">
+                            <a
+                              href={buildGoogleCalUrl(bookingDetails)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[12px] font-semibold text-white/60 hover:text-white border border-white/10 hover:border-white/20 rounded px-3 py-1.5 transition-colors"
+                            >
+                              Google
+                            </a>
+                            <a
+                              href={buildICSUrl(bookingDetails)}
+                              download="estimate-visit.ics"
+                              className="text-[12px] font-semibold text-white/60 hover:text-white border border-white/10 hover:border-white/20 rounded px-3 py-1.5 transition-colors"
+                            >
+                              Apple / Outlook
+                            </a>
+                          </div>
+                        </div>
+                        {bookingDetails.uid && (
+                          <div className="px-5 py-4">
+                            <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-2">Need to make a change?</p>
+                            <div className="flex gap-4">
+                              <a
+                                href={`https://cal.com/booking/${bookingDetails.uid}?reschedule=true`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[12px] font-semibold text-[#58E3EA] hover:text-white transition-colors"
+                              >
+                                Reschedule
+                              </a>
+                              <a
+                                href={`https://cal.com/booking/${bookingDetails.uid}?cancel=true`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[12px] font-semibold text-white/40 hover:text-white transition-colors"
+                              >
+                                Cancel
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => navigate("/")}
+                      className="text-white/40 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+                    >
+                      Back to DOCO
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setShowBooking(true)}
+                      className="border border-white/20 text-white text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:border-white/40"
+                    >
+                      Schedule an Estimate
+                      <ArrowUpRight size={16} strokeWidth={2.5} />
+                    </button>
+                    <button
+                      onClick={() => navigate("/")}
+                      className="text-white/40 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+                    >
+                      Back to DOCO
+                    </button>
+                  </>
+                )}
+                {!detailsSubmitted && (
+                  <p className="text-white/40 text-[13px]">Help us prepare for your estimate visit with a few optional questions.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white/[0.03] border border-white/10 rounded-lg overflow-hidden">
+              <div className="p-5 border-b border-white/[0.06]">
+                <div className="flex items-center gap-3 mb-3">
+                  <MapPin size={14} className="text-[#58E3EA]" />
+                  <span className="text-sm font-semibold text-white">{formData.city}, MN</span>
+                  {formData.cityType === "surrounding" && (
+                    <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded">Expanding Soon</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <Home size={14} className="text-[#58E3EA]" />
+                  <span className="text-sm text-white/70">{PROPERTY_TYPES.find(p => p.id === formData.propertyType)?.label}</span>
+                </div>
+              </div>
+              <div className="p-5 border-b border-white/[0.06]">
+                <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Services</p>
+                <div className="flex gap-3 flex-wrap">
+                  {formData.services.map(svcId => {
+                    const svc = SERVICES.find(s => s.id === svcId);
+                    return (
+                      <div key={svcId} className="relative w-[100px] h-[70px] rounded overflow-hidden">
+                        <img src={SERVICE_IMAGES[svcId]} alt={svc?.label} className="w-full h-full object-cover opacity-60" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                        <span className="absolute bottom-2 left-2 text-[11px] font-bold text-white">{svc?.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className={`p-5 ${serviceEntries.length > 0 || homeContext.length > 0 ? "border-b border-white/[0.06]" : ""}`}>
+                <div className="grid grid-cols-2 gap-y-3 text-sm">
+                  <div>
+                    <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Insurance</span>
+                    <p className="text-white/80 mt-0.5">{formData.hasInsuranceClaim === true ? "Yes" : formData.hasInsuranceClaim === false ? "No" : "Not specified"}</p>
+                  </div>
+                  <div>
+                    <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Timeline</span>
+                    <p className="text-white/80 mt-0.5">{TIMELINES.find(t => t.id === formData.projectTimeline)?.label}</p>
+                  </div>
+                </div>
+              </div>
+              {serviceEntries.map(([svcId, answers], idx) => (
+                <div key={svcId} className={`p-5 ${idx < serviceEntries.length - 1 || homeContext.length > 0 ? "border-b border-white/[0.06]" : ""}`}>
+                  <p className="text-[10px] font-extrabold tracking-widest uppercase text-[#58E3EA] mb-3">{SERVICES.find(s => s.id === svcId)?.label}</p>
+                  {Object.entries(answers).map(([q, a]) => (
+                    <div key={q} className="mb-2 last:mb-0">
+                      <span className="text-[11px] text-white/40">{q}</span>
+                      <p className="text-sm text-white/80">{Array.isArray(a) ? a.join(", ") : a}</p>
+                    </div>
+                  ))}
+                </div>
+              ))}
+              {homeContext.length > 0 && (
+                <div className="p-5">
+                  <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Additional Context</p>
+                  <div className="flex flex-wrap gap-2">
+                    {homeContext.map(chip => (
+                      <span key={chip} className="text-[12px] font-medium px-3 py-1.5 rounded-lg text-[#58E3EA] bg-[#58E3EA]/10 border border-[#58E3EA]/30">{chip}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
       </div>
     );
   }
@@ -727,15 +1125,13 @@ export default function EstimatePage() {
             );
           })}
         </div>
-        <div className="p-6 border-t border-white/[0.06]">
-          <p className="text-[11px] text-white/30 leading-relaxed">
-            Questions?<br />
-            <a href="mailto:hello@docoexteriors.com" className="text-[#58E3EA] hover:underline">hello@docoexteriors.com</a>
-          </p>
-        </div>
       </div>
 
       <div className="flex-1 flex flex-col min-h-screen">
+        <div className="h-1 bg-white/[0.06]">
+          <motion.div className="h-full bg-[#58E3EA]" initial={{ width: "0%" }} animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }} transition={{ duration: 0.3 }} />
+        </div>
+
         <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
           <button onClick={() => navigate("/")} className="flex items-center gap-2 text-white/60" data-testid="button-mobile-back">
             <ChevronLeft size={16} />
@@ -746,12 +1142,8 @@ export default function EstimatePage() {
           </span>
         </div>
 
-        <div className="lg:hidden h-1 bg-white/[0.06]">
-          <motion.div className="h-full bg-[#58E3EA]" initial={{ width: "0%" }} animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }} transition={{ duration: 0.3 }} />
-        </div>
-
-        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 pt-8 pb-[88px] md:py-16">
-          <div className="flex-1">
+        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-6 md:px-12 pt-8 md:py-16 lg:block lg:pt-12">
+          <div className="flex-1 lg:flex-none">
             <AnimatePresence mode="wait">
               <motion.div key={step} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
                 <div className="flex items-start gap-3 mb-8">
@@ -775,6 +1167,7 @@ export default function EstimatePage() {
                           setCityInput(e.target.value);
                           setShowSuggestions(true);
                           setSurroundingPrompt(false);
+                          setSurroundingAcknowledged(false);
                           setNotifyMode(false);
                           setNotifySubmitted(false);
                           setFormData(prev => ({ ...prev, city: "", cityType: null }));
@@ -827,14 +1220,19 @@ export default function EstimatePage() {
                       )}
                     </div>
 
-                    {formData.cityType === "service" && formData.city && (
-                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mt-4 flex items-center gap-2 text-[#58E3EA] text-sm font-medium">
+                  </div>
+                )}
+
+                {step === 1 && (
+                  <div className="mb-8">
+                    {formData.city && formData.cityType === "service" && (
+                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mb-6 flex items-center gap-2 text-[#58E3EA] text-sm font-medium">
                         <Check size={16} /> {formData.city} is in our service area!
                       </motion.div>
                     )}
 
-                    {surroundingPrompt && !notifySubmitted && (
-                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mt-5 bg-white/[0.04] border border-white/10 rounded-lg p-5">
+                    {surroundingPrompt && !surroundingAcknowledged && !notifySubmitted && (
+                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mb-6 bg-white/[0.04] border border-white/10 rounded-lg p-5">
                         <p className="text-sm text-white/80 mb-1 font-semibold">We're expanding to {formData.city} soon!</p>
                         <p className="text-[13px] text-white/50 mb-5 leading-relaxed">
                           We're not quite in your area yet, but we're growing fast. You can continue if your project start date is a ways out, or we can notify you when we arrive.
@@ -842,7 +1240,7 @@ export default function EstimatePage() {
                         {!notifyMode ? (
                           <div className="flex gap-3">
                             <button
-                              onClick={() => setSurroundingPrompt(false)}
+                              onClick={() => setSurroundingAcknowledged(true)}
                               className="bg-[#58E3EA] text-[#0A0A0A] text-[12px] font-bold tracking-wider uppercase px-5 py-3 rounded transition-all hover:bg-[#3ABFC6]"
                               data-testid="button-continue-anyway"
                             >
@@ -887,14 +1285,14 @@ export default function EstimatePage() {
                     )}
 
                     {notifySubmitted && (
-                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mt-5 bg-[#58E3EA]/10 border border-[#58E3EA]/30 rounded-lg p-5">
+                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="mb-6 bg-[#58E3EA]/10 border border-[#58E3EA]/30 rounded-lg p-5">
                         <div className="flex items-center gap-2 mb-2">
                           <Check size={16} className="text-[#58E3EA]" />
                           <p className="text-sm font-semibold text-[#58E3EA]">You're on the list!</p>
                         </div>
                         <p className="text-[13px] text-white/50 mb-4">We'll let you know as soon as we start serving {formData.city}.</p>
                         <button
-                          onClick={() => { setSurroundingPrompt(false); setNotifySubmitted(false); }}
+                          onClick={() => setSurroundingAcknowledged(true)}
                           className="text-[12px] font-bold tracking-wider uppercase text-white/60 hover:text-white transition-colors"
                           data-testid="button-continue-after-notify"
                         >
@@ -902,11 +1300,7 @@ export default function EstimatePage() {
                         </button>
                       </motion.div>
                     )}
-                  </div>
-                )}
 
-                {step === 1 && (
-                  <div className="mb-8">
                     <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Property type</label>
                     <div className="flex flex-col gap-3 mb-8" data-testid="input-property-type">
                       {PROPERTY_TYPES.map((pt) => {
@@ -1027,61 +1421,6 @@ export default function EstimatePage() {
 
                 {step === 3 && (
                   <div className="mb-8">
-                    <div className="mb-6">
-                      <button
-                        onClick={() => setReviewExpanded(!reviewExpanded)}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.05]"
-                        data-testid="button-toggle-review"
-                      >
-                        <span className="text-[11px] font-bold tracking-wider uppercase text-white/40">Review Your Selections</span>
-                        <ChevronDown size={16} className={`text-white/40 transition-transform ${reviewExpanded ? "rotate-180" : ""}`} />
-                      </button>
-                      {reviewExpanded && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="bg-white/[0.03] border border-t-0 border-white/10 rounded-b-lg overflow-hidden">
-                          <div className="p-5 border-b border-white/[0.06]">
-                            <div className="flex items-center gap-3 mb-3">
-                              <MapPin size={14} className="text-[#58E3EA]" />
-                              <span className="text-sm font-semibold text-white">{formData.city}, MN</span>
-                              {formData.cityType === "surrounding" && (
-                                <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded">Expanding Soon</span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <Home size={14} className="text-[#58E3EA]" />
-                              <span className="text-sm text-white/70">{PROPERTY_TYPES.find(p => p.id === formData.propertyType)?.label}</span>
-                            </div>
-                          </div>
-                          <div className="p-5 border-b border-white/[0.06]">
-                            <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Services</p>
-                            <div className="flex gap-3 flex-wrap">
-                              {formData.services.map(svcId => {
-                                const svc = SERVICES.find(s => s.id === svcId);
-                                return (
-                                  <div key={svcId} className="relative w-[100px] h-[70px] rounded overflow-hidden">
-                                    <img src={SERVICE_IMAGES[svcId]} alt={svc?.label} className="w-full h-full object-cover opacity-60" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                                    <span className="absolute bottom-2 left-2 text-[11px] font-bold text-white">{svc?.label}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                          <div className="p-5">
-                            <div className="grid grid-cols-2 gap-y-3 text-sm">
-                              <div>
-                                <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Insurance</span>
-                                <p className="text-white/80 mt-0.5">{formData.hasInsuranceClaim === true ? "Yes" : formData.hasInsuranceClaim === false ? "No" : "Not specified"}</p>
-                              </div>
-                              <div>
-                                <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Timeline</span>
-                                <p className="text-white/80 mt-0.5">{TIMELINES.find(t => t.id === formData.projectTimeline)?.label}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-
                     <div className="space-y-4">
                       <p className="text-[11px] font-bold tracking-wider uppercase text-white/40">Your Information</p>
                       <input
@@ -1132,7 +1471,7 @@ export default function EstimatePage() {
             </AnimatePresence>
           </div>
 
-          <div className="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto bg-[#0A0A0A]/95 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-white/[0.06] px-6 md:px-0 pt-4 pb-6 md:pt-6 md:pb-0 flex items-center justify-between z-40">
+          <div className="sticky bottom-0 bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-white/[0.06] px-8 md:px-0 pt-4 pb-8 md:pt-6 md:pb-0 lg:mt-8 flex items-center justify-between z-40" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
             <button
               onClick={step === 0 ? () => navigate("/") : goBack}
               className="flex items-center gap-2 text-white/50 text-sm font-medium hover:text-white transition-colors"

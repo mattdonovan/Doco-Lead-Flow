@@ -40,6 +40,10 @@ async function sendQuoteEmail(quote: {
     console.warn("RESEND_API_KEY not configured — skipping email notification");
     return;
   }
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[dev] Email suppressed for:', quote.email);
+    return;
+  }
 
   const fn = escapeHtml(quote.firstName);
   const ln = escapeHtml(quote.lastName);
@@ -110,6 +114,10 @@ async function sendNotifyEmail(email: string, city: string) {
     console.warn("RESEND_API_KEY not configured — skipping notification email");
     return;
   }
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[dev] Notify email suppressed for:', email, city);
+    return;
+  }
 
   const safeEmail = escapeHtml(email);
   const safeCity = escapeHtml(city);
@@ -168,6 +176,10 @@ async function sendDetailUpdateEmail(quote: {
 }) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY not configured — skipping detail update email");
+    return;
+  }
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[dev] Detail update email suppressed for:', quote.email);
     return;
   }
 
