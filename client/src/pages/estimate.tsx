@@ -1127,7 +1127,7 @@ export default function EstimatePage() {
         <div className="p-6 pb-10">
           <button onClick={() => navigate("/")} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors mb-8" data-testid="button-back-home">
             <ChevronLeft size={16} />
-            <DocoLogo height={20} />
+            <DocoLogo height={28} />
           </button>
         </div>
         <div className="flex-1 px-4">
@@ -1160,7 +1160,7 @@ export default function EstimatePage() {
         <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
           <button onClick={() => navigate("/")} className="flex items-center gap-2 text-white/60" data-testid="button-mobile-back">
             <ChevronLeft size={16} />
-            <DocoLogo height={18} />
+            <DocoLogo height={28} />
           </button>
           <span className="text-[11px] font-bold tracking-wider uppercase text-white/40">
             Step {step + 1} of {TOTAL_STEPS}
