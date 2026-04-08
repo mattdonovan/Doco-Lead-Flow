@@ -187,22 +187,50 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-/* Google PlaceAutocompleteElement dark theme */
-.gmp-address-autocomplete gmp-placeautocomplete {
-  width: 100%;
-  --gmp-input-background-color: rgba(255, 255, 255, 0.06);
-  --gmp-input-border-color: rgba(255, 255, 255, 0.10);
-  --gmp-input-border-radius: 4px;
-  --gmp-input-color: #ffffff;
-  --gmp-input-placeholder-color: rgba(255, 255, 255, 0.28);
-  --gmp-input-font-size: 14px;
-  --gmp-input-padding: 14px 16px;
-  --gmp-input-font-weight: 500;
+/* Google Maps Autocomplete dark theme */
+.pac-container {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  margin-top: 4px;
+  font-family: 'Montserrat', sans-serif;
 }
 
-.gmp-address-autocomplete gmp-placeautocomplete:focus-within {
-  --gmp-input-border-color: #58E3EA;
-  --gmp-input-background-color: rgba(88, 227, 234, 0.03);
+.pac-container::after {
+  display: none;
+}
+
+.pac-item {
+  color: rgba(255, 255, 255, 0.75);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.pac-item:first-child {
+  border-top: none;
+}
+
+.pac-item:hover,
+.pac-item-selected {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.pac-item-query {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.pac-matched {
+  color: #58E3EA;
+  font-weight: 600;
+}
+
+.pac-icon {
+  display: none;
 }
 
 @layer base {

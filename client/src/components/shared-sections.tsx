@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText, CheckCircle2, Search, X } from "lucide-react";
-import { ALL_CITIES, fuzzyMatchCities } from "@/lib/cities";
+import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText, CheckCircle2, X } from "lucide-react";
+import { SERVICE_AREA, SURROUNDING_AREA } from "@/lib/cities";
 import inspectionBg from "@assets/inspection-2_1773362648618.jpg";
 import insuranceBg from "@assets/insurance-2_1773362648618.jpg";
 import designMeetingBg from "@assets/design-meeting-2_1773362648618.jpg";
@@ -229,36 +229,61 @@ export function GuidedProcess() {
   );
 }
 
+type SelectedAddress = { formatted: string; city: string; cityType: "service" | "surrounding" | null };
+
+function detectCityType(cityName: string): "service" | "surrounding" | null {
+  const n = cityName.trim().toLowerCase();
+  if (SERVICE_AREA.some(c => c.toLowerCase() === n)) return "service";
+  if (SURROUNDING_AREA.some(c => c.toLowerCase() === n)) return "surrounding";
+  return null;
+}
+
 export function CTASection() {
   const [, navigate] = useLocation();
-  const [cityInput, setCityInput] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedCity, setSelectedCity] = useState<{ name: string; type: "service" | "surrounding" } | null>(null);
-  const cityRef = useRef<HTMLDivElement>(null);
+  const [selected, setSelected] = useState<SelectedAddress | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (cityRef.current && !cityRef.current.contains(e.target as Node)) {
-        setShowSuggestions(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    const key = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY;
+    if (!key || document.getElementById("google-maps-script")) return;
+    const script = document.createElement("script");
+    script.id = "google-maps-script";
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&loading=async`;
+    script.async = true;
+    document.head.appendChild(script);
   }, []);
 
-  const cityMatches = fuzzyMatchCities(cityInput);
-  const suggestions = cityMatches.exact.length > 0 ? cityMatches.exact : cityMatches.fuzzy;
-  const isFuzzy = cityMatches.exact.length === 0 && cityMatches.fuzzy.length > 0;
-
-  function handleSelect(city: typeof ALL_CITIES[number]) {
-    setSelectedCity(city);
-    setCityInput(city.name);
-    setShowSuggestions(false);
-  }
+  useEffect(() => {
+    if (!inputRef.current) return;
+    const input = inputRef.current;
+    let tries = 0;
+    const init = () => {
+      const Autocomplete = (window as any).google?.maps?.places?.Autocomplete;
+      if (!Autocomplete) {
+        if (tries++ < 30) setTimeout(init, 200);
+        return;
+      }
+      const autocomplete = new Autocomplete(input, {
+        types: ["address"],
+        componentRestrictions: { country: "us" },
+        fields: ["formatted_address", "address_components"],
+      });
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        const formatted: string = place.formatted_address ?? "";
+        const components: any[] = place.address_components ?? [];
+        const cityName: string = components.find((c: any) => c.types.includes("locality"))?.long_name ?? "";
+        const cityType = detectCityType(cityName);
+        setSelected({ formatted, city: cityName, cityType });
+      });
+    };
+    init();
+  }, []);
 
   function handleContinue() {
-    if (!selectedCity) return;
-    navigate(`/estimate?city=${encodeURIComponent(selectedCity.name)}&cityType=${selectedCity.type}`);
+    if (!selected) return;
+    const params = new URLSearchParams({ city: selected.city, cityType: selected.cityType ?? "", address: selected.formatted });
+    navigate(`/estimate?${params.toString()}`);
   }
 
   return (
@@ -278,66 +303,27 @@ export function CTASection() {
       <div className="flex flex-col gap-5 max-w-md w-full">
         <div>
           <p className="text-white/80 font-semibold mb-1 text-[24px]">Check your service area</p>
-          <p className="text-white/45 text-sm leading-relaxed">Enter the name of a city in MN</p>
+          <p className="text-white/45 text-sm leading-relaxed">Enter your property address</p>
         </div>
 
-        <div className="relative" ref={cityRef}>
-          <div className="relative">
-            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Enter your city..."
-              value={cityInput}
-              onChange={e => {
-                setCityInput(e.target.value);
-                setSelectedCity(null);
-                setShowSuggestions(true);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-              className="w-full bg-white/[0.06] border border-white/[0.12] rounded text-white placeholder-white/30 text-sm pl-10 pr-4 py-3 focus:outline-none focus:border-[#58E3EA]/60 transition-colors"
-              data-testid="input-cta-city"
-            />
-          </div>
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Enter your property address..."
+          onChange={() => setSelected(null)}
+          className="w-full bg-white/[0.06] border border-white/[0.12] rounded text-white placeholder-white/30 text-sm px-4 py-3 focus:outline-none focus:border-[#58E3EA]/60 transition-colors"
+          data-testid="input-cta-address"
+        />
 
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-[#141414] border border-white/[0.12] rounded overflow-hidden shadow-2xl">
-              {isFuzzy && (
-                <div className="px-4 py-2 text-[11px] text-white/35 font-medium tracking-wide border-b border-white/[0.07]">
-                  Did you mean?
-                </div>
-              )}
-              {suggestions.map(c => (
-                <button
-                  key={c.name}
-                  onClick={() => handleSelect(c)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-white/[0.07] transition-colors"
-                  data-testid={`option-city-${c.name.toLowerCase().replace(/\s+/g, "-")}`}
-                >
-                  <span className="text-white/85">{c.name}</span>
-                  {c.type === "service" ? (
-                    <span className="text-[10px] font-bold tracking-wider text-[#58E3EA] uppercase">In area</span>
-                  ) : (
-                    <span className="text-[10px] font-bold tracking-wider text-white/30 uppercase">Expanding</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {selectedCity && (
+        {selected && (
           <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              {selectedCity.type === "service" ? (
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+              {selected.cityType === "service" ? (
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3 px-4 py-3 rounded bg-[#58E3EA]/[0.08] border border-[#58E3EA]/20">
                     <CheckCircle2 size={18} className="text-[#58E3EA] shrink-0" />
                     <span className="text-sm text-white/80">
-                      <span className="text-white font-semibold">{selectedCity.name}</span> is in our service area!
+                      <span className="text-white font-semibold">{selected.city}</span> is in our service area!
                     </span>
                   </div>
                   <button
@@ -349,12 +335,12 @@ export function CTASection() {
                     <ArrowUpRight size={15} strokeWidth={2.5} />
                   </button>
                 </div>
-              ) : (
+              ) : selected.cityType === "surrounding" ? (
                 <div className="flex flex-col gap-4">
                   <div className="flex items-start gap-3 px-4 py-3 rounded bg-white/[0.04] border border-white/[0.1]">
                     <MapPin size={16} className="text-white/40 shrink-0 mt-0.5" />
                     <span className="text-sm text-white/55 leading-relaxed">
-                      We're expanding to <span className="text-white/75 font-medium">{selectedCity.name}</span> soon. You can still submit a request and we'll be in touch when we reach your area.
+                      We're expanding to <span className="text-white/75 font-medium">{selected.city}</span> soon. You can still submit a request and we'll be in touch when we reach your area.
                     </span>
                   </div>
                   <button
@@ -366,12 +352,17 @@ export function CTASection() {
                     <ArrowUpRight size={15} strokeWidth={2.5} />
                   </button>
                 </div>
+              ) : (
+                <div className="flex items-start gap-3 px-4 py-3 rounded bg-white/[0.04] border border-white/[0.1]">
+                  <MapPin size={16} className="text-white/40 shrink-0 mt-0.5" />
+                  <span className="text-sm text-white/55 leading-relaxed">
+                    We don't currently serve this area. We cover the Minneapolis/St. Cloud metro.
+                  </span>
+                </div>
               )}
             </motion.div>
           </AnimatePresence>
         )}
-
-
       </div>
     </section>
   );

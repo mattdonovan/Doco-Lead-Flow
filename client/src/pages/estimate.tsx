@@ -386,14 +386,17 @@ export default function EstimatePage() {
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [addressOutOfService, setAddressOutOfService] = useState(false);
 
-  const addressContainerRef = useRef<HTMLDivElement>(null);
+  const addressInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const city = params.get("city");
     const cityType = params.get("cityType") as "service" | "surrounding" | null;
+    const address = params.get("address") ?? "";
     if (city && cityType) {
-      setFormData(prev => ({ ...prev, city, cityType }));
+      setFormData(prev => ({ ...prev, city, cityType, address }));
+      if (addressInputRef.current && address) addressInputRef.current.value = address;
+      if (cityType === "surrounding") setSurroundingPrompt(true);
       setStep(1);
     }
   }, []);
@@ -440,24 +443,25 @@ export default function EstimatePage() {
   }, []);
 
   useEffect(() => {
-    if (!addressContainerRef.current) return;
+    if (!addressInputRef.current) return;
+    const input = addressInputRef.current;
     let tries = 0;
-    const container = addressContainerRef.current;
     const init = () => {
-      const PlaceAuto = (google?.maps?.places as any)?.PlaceAutocompleteElement;
-      if (typeof google === "undefined" || !PlaceAuto) {
-        if (tries++ < 30) setTimeout(init, 300);
+      const Autocomplete = (window as any).google?.maps?.places?.Autocomplete;
+      if (!Autocomplete) {
+        if (tries++ < 30) setTimeout(init, 200);
         return;
       }
-      container.innerHTML = "";
-      const el = new PlaceAuto({ componentRestrictions: { country: "us" }, types: ["address"] });
-      container.appendChild(el);
-      el.addEventListener("gmp-placeselect", async (e: any) => {
-        const place = e.place;
-        await place.fetchFields({ fields: ["formattedAddress", "addressComponents"] });
-        const formatted: string = place.formattedAddress ?? "";
-        const components: any[] = place.addressComponents ?? [];
-        const cityName: string = components.find((c: any) => c.types.includes("locality"))?.longText ?? "";
+      const autocomplete = new Autocomplete(input, {
+        types: ["address"],
+        componentRestrictions: { country: "us" },
+        fields: ["formatted_address", "address_components"],
+      });
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        const formatted: string = place.formatted_address ?? "";
+        const components: any[] = place.address_components ?? [];
+        const cityName: string = components.find((c: any) => c.types.includes("locality"))?.long_name ?? "";
         const cityType = detectCityType(cityName);
         setAddressOutOfService(cityType === null);
         setSurroundingPrompt(cityType === "surrounding");
@@ -614,7 +618,7 @@ export default function EstimatePage() {
   };
 
   const QUESTIONS = [
-    "What's the property address?",
+    "Check your service area.",
     "Tell us about your project.",
     "A few more details.",
     "Almost done! Add your contact info to submit.",
@@ -1178,7 +1182,17 @@ export default function EstimatePage() {
 
                 {step === 0 && (
                   <div className="mb-8">
-                    <div ref={addressContainerRef} className="gmp-address-autocomplete" data-testid="input-address" />
+                    <input
+                      ref={addressInputRef}
+                      type="text"
+                      placeholder="Enter your property address..."
+                      className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03]"
+                      data-testid="input-address"
+                      onChange={() => {
+                        setAddressOutOfService(false);
+                        setFormData(prev => ({ ...prev, address: "", city: "", cityType: null }));
+                      }}
+                    />
                     {addressOutOfService && (
                       <p className="mt-3 text-sm text-white/50">We don't currently serve this area. We cover the Minneapolis/St. Cloud metro — try a different address.</p>
                     )}
