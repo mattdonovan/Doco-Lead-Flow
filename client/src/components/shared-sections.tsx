@@ -241,6 +241,7 @@ function detectCityType(cityName: string): "service" | "surrounding" | null {
 export function CTASection() {
   const [, navigate] = useLocation();
   const [selected, setSelected] = useState<SelectedAddress | null>(null);
+  const [notSpecific, setNotSpecific] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -272,6 +273,13 @@ export function CTASection() {
         const place = autocomplete.getPlace();
         const formatted: string = place.formatted_address ?? "";
         const components: any[] = place.address_components ?? [];
+        const hasStreetNumber = components.some((c: any) => c.types.includes("street_number"));
+        if (!hasStreetNumber) {
+          setNotSpecific(true);
+          setSelected(null);
+          return;
+        }
+        setNotSpecific(false);
         const cityName: string = components.find((c: any) => c.types.includes("locality"))?.long_name ?? "";
         const cityType = detectCityType(cityName);
         setSelected({ formatted, city: cityName, cityType });
@@ -306,14 +314,19 @@ export function CTASection() {
           <p className="text-white/45 text-sm leading-relaxed">Enter your property address</p>
         </div>
 
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Enter your property address..."
-          onChange={() => setSelected(null)}
-          className="w-full bg-white/[0.06] border border-white/[0.12] rounded text-white placeholder-white/30 text-sm px-4 py-3 focus:outline-none focus:border-[#58E3EA]/60 transition-colors"
-          data-testid="input-cta-address"
-        />
+        <div>
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Enter your property address..."
+            onChange={() => { setSelected(null); setNotSpecific(false); }}
+            className="w-full bg-white/[0.06] border border-white/[0.12] rounded text-white placeholder-white/30 text-sm px-4 py-3 focus:outline-none focus:border-[#58E3EA]/60 transition-colors"
+            data-testid="input-cta-address"
+          />
+          {notSpecific && (
+            <p className="mt-2 text-sm text-white/50">Please enter a specific property address — we need a street number to locate your home.</p>
+          )}
+        </div>
 
         {selected && (
           <AnimatePresence>

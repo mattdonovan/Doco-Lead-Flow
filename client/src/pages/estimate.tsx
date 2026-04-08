@@ -162,22 +162,24 @@ function formatBookingTime(startIso: string, endIso?: string, tz?: string): stri
   return `${start.replace(/ [A-Z]{2,4}$/, "")} – ${end}${start.match(/ [A-Z]{2,4}$/)?.[0] ?? ""}`;
 }
 
-function buildGoogleCalUrl(d: BookingDetails): string {
+function buildGoogleCalUrl(d: BookingDetails, address?: string): string {
   const fmt = (iso: string) => new Date(iso).toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
   const end = d.endTime ?? new Date(new Date(d.startTime).getTime() + 3600000).toISOString();
+  const location = address || undefined;
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: "Estimate Visit with DOCO Exteriors",
     dates: `${fmt(d.startTime)}/${fmt(end)}`,
     details: "Your estimate visit with DOCO Exteriors is confirmed.",
-    ...(d.location ? { location: d.location } : {}),
+    ...(location ? { location } : {}),
   });
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
-function buildICSUrl(d: BookingDetails): string {
+function buildICSUrl(d: BookingDetails, address?: string): string {
   const fmt = (iso: string) => new Date(iso).toISOString().replace(/[-:.]/g, "").slice(0, 15) + "Z";
   const end = d.endTime ?? new Date(new Date(d.startTime).getTime() + 3600000).toISOString();
+  const location = address || undefined;
   const ics = [
     "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DOCO Exteriors//EN",
     "BEGIN:VEVENT",
@@ -185,7 +187,7 @@ function buildICSUrl(d: BookingDetails): string {
     `DTSTART:${fmt(d.startTime)}`,
     `DTEND:${fmt(end)}`,
     "SUMMARY:Estimate Visit with DOCO Exteriors",
-    d.location ? `LOCATION:${d.location}` : "",
+    location ? `LOCATION:${location}` : "",
     "END:VEVENT", "END:VCALENDAR",
   ].filter(Boolean).join("\r\n");
   return `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
@@ -208,7 +210,7 @@ function buildBookingNotes(
   serviceLabels.forEach(l => lines.push(`  • ${l}`));
   lines.push("");
 
-  lines.push(`Property: ${propertyLabel} at ${formData.address || formData.city}`);
+  lines.push(`Property type: ${propertyLabel}`);
   lines.push(`Timeline: ${timelineLabel}`);
   if (formData.hasInsuranceClaim !== null) {
     lines.push(`Insurance claim: ${formData.hasInsuranceClaim ? "Yes" : "No"}`);
@@ -331,6 +333,7 @@ function BookingScreen({
               name: formData.fullName,
               email: formData.email,
               notes,
+              propertyAddress: formData.address || formData.city,
             }}
           />
         )}
@@ -385,6 +388,7 @@ export default function EstimatePage() {
   const [emailTouched, setEmailTouched] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [addressOutOfService, setAddressOutOfService] = useState(false);
+  const [addressNotSpecific, setAddressNotSpecific] = useState(false);
 
   const addressInputRef = useRef<HTMLInputElement>(null);
 
@@ -461,6 +465,14 @@ export default function EstimatePage() {
         const place = autocomplete.getPlace();
         const formatted: string = place.formatted_address ?? "";
         const components: any[] = place.address_components ?? [];
+        const hasStreetNumber = components.some((c: any) => c.types.includes("street_number"));
+        if (!hasStreetNumber) {
+          setAddressNotSpecific(true);
+          setAddressOutOfService(false);
+          setFormData(prev => ({ ...prev, address: "", city: "", cityType: null }));
+          return;
+        }
+        setAddressNotSpecific(false);
         const cityName: string = components.find((c: any) => c.types.includes("locality"))?.long_name ?? "";
         const cityType = detectCityType(cityName);
         setAddressOutOfService(cityType === null);
@@ -833,11 +845,11 @@ export default function EstimatePage() {
             <div>
               <div className="bg-white/[0.03] border border-white/10 rounded-lg mb-4 overflow-hidden">
                 <div className="p-5 border-b border-white/[0.06]">
-                  <div className="flex items-center gap-3 mb-3">
-                    <MapPin size={14} className="text-[#58E3EA]" />
-                    <span className="text-sm font-semibold text-white">{formData.city}, MN</span>
+                  <div className="flex items-start gap-3 mb-3">
+                    <MapPin size={14} className="text-[#58E3EA] mt-0.5 shrink-0" />
+                    <span className="text-sm font-semibold text-white leading-snug">{formData.address || formData.city}</span>
                     {formData.cityType === "surrounding" && (
-                      <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded">Expanding Soon</span>
+                      <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded shrink-0">Expanding Soon</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -970,17 +982,17 @@ export default function EstimatePage() {
                           <p className="text-sm font-semibold text-white">{formatBookingDate(bookingDetails.startTime, bookingDetails.timezone)}</p>
                           <p className="text-sm text-white/60">{formatBookingTime(bookingDetails.startTime, bookingDetails.endTime, bookingDetails.timezone)}</p>
                         </div>
-                        {bookingDetails.location && (
+                        {(formData.address || formData.city) && (
                           <div className="px-5 py-4 border-b border-white/[0.06]">
                             <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-1">Where</p>
-                            <p className="text-sm text-white/70">{bookingDetails.location}</p>
+                            <p className="text-sm text-white/70">{formData.address || formData.city}</p>
                           </div>
                         )}
                         <div className="px-5 py-4 border-b border-white/[0.06]">
                           <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-2">Add to calendar</p>
                           <div className="flex gap-3 flex-wrap">
                             <a
-                              href={buildGoogleCalUrl(bookingDetails)}
+                              href={buildGoogleCalUrl(bookingDetails, formData.address || formData.city)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-[12px] font-semibold text-white/60 hover:text-white border border-white/10 hover:border-white/20 rounded px-3 py-1.5 transition-colors"
@@ -988,7 +1000,7 @@ export default function EstimatePage() {
                               Google
                             </a>
                             <a
-                              href={buildICSUrl(bookingDetails)}
+                              href={buildICSUrl(bookingDetails, formData.address || formData.city)}
                               download="estimate-visit.ics"
                               className="text-[12px] font-semibold text-white/60 hover:text-white border border-white/10 hover:border-white/20 rounded px-3 py-1.5 transition-colors"
                             >
@@ -1054,11 +1066,11 @@ export default function EstimatePage() {
 
             <div className="bg-white/[0.03] border border-white/10 rounded-lg overflow-hidden">
               <div className="p-5 border-b border-white/[0.06]">
-                <div className="flex items-center gap-3 mb-3">
-                  <MapPin size={14} className="text-[#58E3EA]" />
-                  <span className="text-sm font-semibold text-white">{formData.city}, MN</span>
+                <div className="flex items-start gap-3 mb-3">
+                  <MapPin size={14} className="text-[#58E3EA] mt-0.5 shrink-0" />
+                  <span className="text-sm font-semibold text-white leading-snug">{formData.address || formData.city}</span>
                   {formData.cityType === "surrounding" && (
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded">Expanding Soon</span>
+                    <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded shrink-0">Expanding Soon</span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
@@ -1190,9 +1202,13 @@ export default function EstimatePage() {
                       data-testid="input-address"
                       onChange={() => {
                         setAddressOutOfService(false);
+                        setAddressNotSpecific(false);
                         setFormData(prev => ({ ...prev, address: "", city: "", cityType: null }));
                       }}
                     />
+                    {addressNotSpecific && (
+                      <p className="mt-3 text-sm text-white/50">Please enter a specific property address — we need a street number to locate your home.</p>
+                    )}
                     {addressOutOfService && (
                       <p className="mt-3 text-sm text-white/50">We don't currently serve this area. We cover the Minneapolis/St. Cloud metro — try a different address.</p>
                     )}
