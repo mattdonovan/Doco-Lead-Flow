@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { InsertQuoteRequest } from "@shared/schema";
-import { fuzzyMatchCities } from "@/lib/cities";
+import { SERVICE_AREA, SURROUNDING_AREA } from "@/lib/cities";
 
 const SERVICE_IMAGES: Record<string, string> = {
   roofing: "https://cdn.midjourney.com/365218d6-e05d-4ccf-860d-234a277025fd/0_0.png",
@@ -126,6 +126,7 @@ function DocoLogo({ height = 24 }: { height?: number }) {
 }
 
 interface FormData {
+  address: string;
   city: string;
   cityType: "service" | "surrounding" | null;
   propertyType: string;
@@ -207,7 +208,7 @@ function buildBookingNotes(
   serviceLabels.forEach(l => lines.push(`  • ${l}`));
   lines.push("");
 
-  lines.push(`Property: ${propertyLabel} in ${formData.city}, MN`);
+  lines.push(`Property: ${propertyLabel} at ${formData.address || formData.city}`);
   lines.push(`Timeline: ${timelineLabel}`);
   if (formData.hasInsuranceClaim !== null) {
     lines.push(`Insurance claim: ${formData.hasInsuranceClaim ? "Yes" : "No"}`);
@@ -361,6 +362,7 @@ export default function EstimatePage() {
   const [bookingDetails, setBookingDetails] = useState<BookingDetails | undefined>();
 
   const [formData, setFormData] = useState<FormData>({
+    address: "",
     city: "",
     cityType: null,
     propertyType: "",
@@ -375,8 +377,6 @@ export default function EstimatePage() {
   const [serviceAnswers, setServiceAnswers] = useState<Record<string, Record<string, string | string[]>>>({});
   const [homeContext, setHomeContext] = useState<string[]>([]);
 
-  const [cityInput, setCityInput] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [surroundingPrompt, setSurroundingPrompt] = useState(false);
   const [surroundingAcknowledged, setSurroundingAcknowledged] = useState(false);
   const [notifyMode, setNotifyMode] = useState(false);
@@ -384,29 +384,18 @@ export default function EstimatePage() {
   const [notifySubmitted, setNotifySubmitted] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
+  const [addressOutOfService, setAddressOutOfService] = useState(false);
 
-  const cityRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const addressContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const city = params.get("city");
     const cityType = params.get("cityType") as "service" | "surrounding" | null;
     if (city && cityType) {
-      setCityInput(city);
       setFormData(prev => ({ ...prev, city, cityType }));
       setStep(1);
     }
-  }, []);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (cityRef.current && !cityRef.current.contains(e.target as Node)) {
-        setShowSuggestions(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   useEffect(() => {
@@ -433,22 +422,54 @@ export default function EstimatePage() {
     if (showSummary) window.history.replaceState(null, '', '#summary');
   }, [showSummary]);
 
-  const cityMatches = fuzzyMatchCities(cityInput);
-  const filteredCities = cityMatches.exact;
-  const fuzzyCities = cityMatches.fuzzy;
+  function detectCityType(cityName: string): "service" | "surrounding" | null {
+    const normalized = cityName.trim().toLowerCase();
+    if (SERVICE_AREA.some(c => c.toLowerCase() === normalized)) return "service";
+    if (SURROUNDING_AREA.some(c => c.toLowerCase() === normalized)) return "surrounding";
+    return null;
+  }
 
-  const selectCity = (city: { name: string; type: "service" | "surrounding" }) => {
-    setCityInput(city.name);
-    setFormData(prev => ({ ...prev, city: city.name, cityType: city.type }));
-    setShowSuggestions(false);
-    setSurroundingAcknowledged(false);
-    if (city.type === "surrounding") {
-      setSurroundingPrompt(true);
-    } else {
-      setSurroundingPrompt(false);
-    }
-    setStep(1);
-  };
+  useEffect(() => {
+    const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!key || document.getElementById("google-maps-script")) return;
+    const script = document.createElement("script");
+    script.id = "google-maps-script";
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&loading=async`;
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!addressContainerRef.current) return;
+    let tries = 0;
+    const container = addressContainerRef.current;
+    const init = () => {
+      const PlaceAuto = (google?.maps?.places as any)?.PlaceAutocompleteElement;
+      if (typeof google === "undefined" || !PlaceAuto) {
+        if (tries++ < 30) setTimeout(init, 300);
+        return;
+      }
+      container.innerHTML = "";
+      const el = new PlaceAuto({ componentRestrictions: { country: "us" }, types: ["address"] });
+      container.appendChild(el);
+      el.addEventListener("gmp-placeselect", async (e: any) => {
+        const place = e.place;
+        await place.fetchFields({ fields: ["formattedAddress", "addressComponents"] });
+        const formatted: string = place.formattedAddress ?? "";
+        const components: any[] = place.addressComponents ?? [];
+        const cityName: string = components.find((c: any) => c.types.includes("locality"))?.longText ?? "";
+        const cityType = detectCityType(cityName);
+        setAddressOutOfService(cityType === null);
+        setSurroundingPrompt(cityType === "surrounding");
+        setSurroundingAcknowledged(false);
+        setNotifyMode(false);
+        setNotifySubmitted(false);
+        setFormData(prev => ({ ...prev, address: formatted, city: cityName, cityType }));
+        if (cityType !== null) setStep(1);
+      });
+    };
+    init();
+  }, [step === 0]);
 
 
   const submitMutation = useMutation({
@@ -537,8 +558,8 @@ export default function EstimatePage() {
       lastName,
       email: formData.email,
       phone: formData.phone || null,
-      address: null,
-      city: formData.city + ", MN",
+      address: formData.address || null,
+      city: formData.city,
       services: formData.services,
       propertyType: formData.propertyType,
       projectTimeline: formData.projectTimeline,
@@ -593,7 +614,7 @@ export default function EstimatePage() {
   };
 
   const QUESTIONS = [
-    "What city is your property in?",
+    "What's the property address?",
     "Tell us about your project.",
     "A few more details.",
     "Almost done! Add your contact info to submit.",
@@ -1157,69 +1178,10 @@ export default function EstimatePage() {
 
                 {step === 0 && (
                   <div className="mb-8">
-                    <div ref={cityRef} className="relative">
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        placeholder="Start typing your city..."
-                        value={cityInput}
-                        onChange={(e) => {
-                          setCityInput(e.target.value);
-                          setShowSuggestions(true);
-                          setSurroundingPrompt(false);
-                          setSurroundingAcknowledged(false);
-                          setNotifyMode(false);
-                          setNotifySubmitted(false);
-                          setFormData(prev => ({ ...prev, city: "", cityType: null }));
-                        }}
-                        onFocus={() => { if (cityInput.trim()) setShowSuggestions(true); }}
-                        className="w-full bg-white/[0.06] border border-white/10 px-4 py-3.5 text-sm font-medium text-white rounded placeholder:text-white/28 outline-none transition-all focus:border-[#58E3EA] focus:bg-[#58E3EA]/[0.03]"
-                        data-testid="input-city"
-                      />
-                      {showSuggestions && filteredCities.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-[#1A1A1A] border border-white/10 rounded max-h-[240px] overflow-y-auto z-50">
-                          {filteredCities.map((city) => (
-                            <button
-                              key={city.name}
-                              onClick={() => selectCity(city)}
-                              className="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/[0.06] flex items-center justify-between transition-colors"
-                              data-testid={`city-option-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
-                            >
-                              <span>{city.name}, MN</span>
-                              {city.type === "surrounding" && (
-                                <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70">Expanding Soon</span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {showSuggestions && cityInput.trim().length >= 2 && filteredCities.length === 0 && fuzzyCities.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-[#1A1A1A] border border-white/10 rounded z-50 overflow-hidden">
-                          <div className="px-4 pt-3 pb-1.5">
-                            <p className="text-xs text-white/40 font-medium" data-testid="text-did-you-mean">Did you mean?</p>
-                          </div>
-                          {fuzzyCities.map((city) => (
-                            <button
-                              key={city.name}
-                              onClick={() => selectCity(city)}
-                              className="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/[0.06] flex items-center justify-between transition-colors"
-                              data-testid={`city-option-fuzzy-${city.name.toLowerCase().replace(/\s+/g, "-")}`}
-                            >
-                              <span>{city.name}, MN</span>
-                              {city.type === "surrounding" && (
-                                <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70">Expanding Soon</span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {showSuggestions && cityInput.trim().length >= 2 && filteredCities.length === 0 && fuzzyCities.length === 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-[#1A1A1A] border border-white/10 rounded p-4">
-                          <p className="text-sm text-white/50">We don't currently serve this area. Try a different city in the Minneapolis metro.</p>
-                        </div>
-                      )}
-                    </div>
-
+                    <div ref={addressContainerRef} className="gmp-address-autocomplete" data-testid="input-address" />
+                    {addressOutOfService && (
+                      <p className="mt-3 text-sm text-white/50">We don't currently serve this area. We cover the Minneapolis/St. Cloud metro — try a different address.</p>
+                    )}
                   </div>
                 )}
 
