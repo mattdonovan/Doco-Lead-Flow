@@ -4,6 +4,7 @@ DOCO Exteriors is a residential and commercial exterior contractor serving the g
 
 Website: https://docoexteriors.com
 Estimate form: https://docoexteriors.com/estimate
+Contact: support@docoexteriors.com
 
 ---
 
@@ -22,9 +23,24 @@ The following cities are in DOCO's active service area (Minnesota):
 
 Albertville, Andover, Anoka, Becker, Big Lake, Blaine, Brooklyn Center, Brooklyn Park, Buffalo, Champlin, Coon Rapids, Crystal, Dayton, Delano, Elk River, Golden Valley, Hamel, Howard Lake, Loretto, Maple Grove, Medina, Monticello, New Hope, Osseo, Otsego, Plymouth, Ramsey, Robbinsdale, Rogers, St. Michael, Watertown, Waverly
 
-The following surrounding-area cities may be served — check availability via API:
+The following surrounding-area cities may be served — check availability via the service-area API endpoint:
 
 Afton, Apple Valley, Bayport, Belle Plaine, Bloomington, Burnsville, Cambridge, Cannon Falls, Carver, Chanhassen, Chaska, Cottage Grove, East Bethel, Eagan, Eden Prairie, Edina, Excelsior, Farmington, Forest Lake, Fridley, Hopkins, Hugo, Lake Elmo, Lakeville, Lino Lakes, Mahtomedi, Maplewood, Minnetonka, Mound, Newport, North Branch, Northfield, Oak Park Heights, Oakdale, Prior Lake, Richfield, Rosemount, Roseville, Savage, Shakopee, Shorewood, Spring Lake Park, St. Louis Park, St. Paul, Stacy, Stillwater, Victoria, Waconia, Wayzata, White Bear Lake, Woodbury, Wyoming
+
+---
+
+## Estimate Request Flow
+
+The estimate request form at /estimate is a multi-step lead capture and scheduling flow:
+
+1. Address entry — The customer enters a full property address using Google Places Autocomplete. The system validates that a specific street address was selected (not just a city or region), extracts the city, and determines whether the property is in the service area, surrounding area, or outside the service area.
+2. Services — Customer selects one or more services (Roofing, Siding, Windows, Gutters).
+3. Property details — Property type, project timeline, and insurance claim status.
+4. Contact information — Name, email, and phone number.
+5. Scheduling — Cal.com embed for booking an estimate visit. The property address is pre-filled into the Cal.com "Property Address" field automatically.
+6. Confirmation — Summary of the booking with date, time, and property address.
+
+The form navigates to /estimate with optional query params: city, cityType (in-service | surrounding | out-of-service), and address.
 
 ---
 
@@ -54,7 +70,7 @@ Required fields:
 
 Optional fields:
   phone                string   — Customer's 10-digit phone number
-  address              string   — Street address
+  address              string   — Full street address (preferred over city alone)
   hasInsuranceClaim    boolean  — Whether this is an insurance claim
   additionalDetails    string   — Any extra context from the customer
 
@@ -65,10 +81,19 @@ Example request body:
   "email": "jane@example.com",
   "phone": "7635550123",
   "city": "Maple Grove",
+  "address": "123 Main St, Maple Grove, MN 55369",
   "services": ["Roofing"],
   "propertyType": "Single Family Home",
   "projectTimeline": "Within 1-3 months",
   "hasInsuranceClaim": false
 }
 
-A successful submission returns HTTP 201 with the created quote object. The DOCO team is notified by email automatically.
+A successful submission returns HTTP 201 with the created quote object. The DOCO team is notified by email automatically at support@docoexteriors.com.
+
+---
+
+## Legal Pages
+
+- /privacy-policy — What DOCO collects, how it's used, storage, sharing, cookies, and customer rights.
+- /terms-of-service — Terms governing use of the website and estimate request system.
+- /cookie-notice — Details on cookies set by this site (none first-party; Cal.com sets functional session cookies only).

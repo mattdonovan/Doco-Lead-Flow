@@ -459,10 +459,10 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
         </button>
       </div>
       {variant !== "subpage" && (
-        <ul className="hidden md:flex items-center gap-9 list-none absolute left-1/2 -translate-x-1/2">
-          <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
-          <li><button onClick={() => navigate("/#services")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
-          <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
+        <ul className="hidden md:flex items-center gap-1 list-none absolute left-1/2 -translate-x-1/2">
+          <li><button onClick={() => navigate("/about")} className="text-[13px] font-bold px-6 py-2.5 rounded text-white/70 hover:text-white hover:bg-white/[0.07] transition-all" data-testid="link-nav-about">About</button></li>
+          <li><button onClick={() => navigate("/#services")} className="text-[13px] font-bold px-6 py-2.5 rounded text-white/70 hover:text-white hover:bg-white/[0.07] transition-all" data-testid="link-nav-services">Services</button></li>
+          <li><a href="https://app.gethearth.com/partners/doco-exteriors/kris/apply" target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold px-6 py-2.5 rounded text-white/70 hover:text-white hover:bg-white/[0.07] transition-all inline-block" data-testid="link-nav-financing">Financing</a></li>
         </ul>
       )}
       <button
