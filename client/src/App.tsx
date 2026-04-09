@@ -10,6 +10,9 @@ import ComingSoon from "@/pages/coming-soon";
 import EstimatePage from "@/pages/estimate";
 import About from "@/pages/about";
 import ServicePage from "@/pages/service";
+import PrivacyPolicy from "@/pages/privacy-policy";
+import TermsOfService from "@/pages/terms-of-service";
+import CookieNotice from "@/pages/cookie-notice";
 import { SEOHead } from "@/components/seo-head";
 
 function ScrollToTop() {
@@ -31,6 +34,9 @@ function Router() {
         <Route path="/estimate" component={EstimatePage} />
         <Route path="/about" component={About} />
         <Route path="/services/:slug" component={ServicePage} />
+        <Route path="/privacy-policy" component={PrivacyPolicy} />
+        <Route path="/terms-of-service" component={TermsOfService} />
+        <Route path="/cookie-notice" component={CookieNotice} />
         <Route component={NotFound} />
       </Switch>
     </>

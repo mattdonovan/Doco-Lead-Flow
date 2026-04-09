@@ -327,7 +327,7 @@
   </div>
   <div class="about-content">
     <h2>Built on Trust,<br>Finished with Pride.</h2>
-    <p>DOCO Exteriors was founded by Kris and Jenna Donovan with one goal in mind: to give Minneapolis homeowners an exterior contractor they can genuinely trust. We see your home as more than a project — it's your biggest investment and where life happens.</p>
+    <p>DOCO Exteriors was founded by Kris and Jenna Donovan with one goal in mind: to give Minnesota Homeowners an exterior contractor they can genuinely trust. We see your home as more than a project — it's your biggest investment and where life happens.</p>
     <p>With deep roots in the Twin Cities, our crews show up on time, communicate clearly, and leave every job site cleaner than they found it. From a full roof replacement to new windows and gutters, we bring the same level of care to every single home.</p>
     <a href="#about" class="about-link">
       More about us

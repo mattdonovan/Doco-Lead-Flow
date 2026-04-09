@@ -55,9 +55,9 @@ export default function Home() {
           <img src="/logo-header.svg" alt="DOCO Exteriors" style={{ height: 28, width: "auto" }} />
         </button>
         <ul className="hidden md:flex items-center gap-9 list-none absolute left-1/2 -translate-x-1/2">
-          <li><button onClick={() => scrollTo("about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
-          <li><button onClick={() => scrollTo("services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
-          <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
+          <li><button onClick={() => scrollTo("about")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
+          <li><button onClick={() => scrollTo("services")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
+          <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
         </ul>
         <button
           onClick={() => navigate("/estimate")}
@@ -83,7 +83,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#58E3EA] mb-6 flex items-center gap-2.5"
+              className="text-[11px] font-bold tracking-[0.2em] text-[#58E3EA] mb-6 flex items-center gap-2.5"
             >
               <span className="w-8 h-0.5 bg-[#58E3EA]" />
               Minneapolis Exterior Specialists
@@ -121,7 +121,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => scrollTo("services")}
-                className="text-white text-[13px] font-semibold tracking-wider uppercase inline-flex items-center gap-2 border-b border-white/30 pb-0.5 transition-colors hover:text-[#58E3EA] hover:border-[#58E3EA]"
+                className="text-white text-[13px] font-semibold tracking-wider inline-flex items-center gap-2 border-b border-white/30 pb-0.5 transition-colors hover:text-[#58E3EA] hover:border-[#58E3EA]"
                 data-testid="button-hero-services"
               >
                 Our Services
@@ -154,14 +154,14 @@ export default function Home() {
             Built on Trust,<br/>Finished with Pride.
           </h2>
           <p className="text-[15px] leading-relaxed text-[#444] mb-5 max-w-[480px]">
-            DOCO Exteriors was founded with one goal in mind: to give Minneapolis homeowners an exterior contractor they can genuinely trust. We see your home as more than a project — it's your biggest investment and where life happens.
+            DOCO Exteriors was founded with one goal in mind: to give Minnesota Homeowners an exterior contractor they can genuinely trust. We see your home as more than a project — it's your biggest investment and where life happens.
           </p>
           <p className="text-[15px] leading-relaxed text-[#444] mb-5 max-w-[480px]">
             With deep roots in the Twin Cities, our crews show up on time, communicate clearly, and leave every job site cleaner than they found it. From a full roof replacement to new windows and gutters, we bring the same level of care to every single home.
           </p>
           <button
             onClick={() => navigate("/about")}
-            className="text-[#0A0A0A] text-[13px] font-bold tracking-wider uppercase inline-flex items-center gap-2 mt-2 border-b-2 border-[#0A0A0A] pb-0.5 self-start transition-colors hover:text-[#3ABFC6] hover:border-[#3ABFC6]"
+            className="text-[#0A0A0A] text-[13px] font-bold tracking-wider inline-flex items-center gap-2 mt-2 border-b-2 border-[#0A0A0A] pb-0.5 self-start transition-colors hover:text-[#3ABFC6] hover:border-[#3ABFC6]"
             data-testid="link-about-more"
           >
             More about us
@@ -189,11 +189,11 @@ export default function Home() {
             >
               <img src={svc.img} alt={svc.tag} className="w-full h-full object-cover transition-transform duration-600 opacity-70 group-hover:scale-[1.06] group-hover:opacity-85" />
               <div className="absolute bottom-0 left-0 right-0 p-7" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, transparent 100%)" }}>
-                <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest uppercase px-2.5 py-1 rounded-sm mb-3">{svc.tag}</span>
+                <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest px-2.5 py-1 rounded-sm mb-3">{svc.tag}</span>
                 <h3 className="text-xl font-bold mb-2.5 tracking-tight">{svc.title}</h3>
                 <p className="text-[13px] text-white/70 leading-relaxed mb-4">{svc.desc}</p>
                 <span
-                  className="text-[12px] font-bold tracking-wider uppercase text-[#58E3EA] flex items-center gap-1.5 transition-all group-hover:gap-2.5"
+                  className="text-[12px] font-bold tracking-wider text-[#58E3EA] flex items-center gap-1.5 transition-all group-hover:gap-2.5"
                   data-testid={`link-service-quote-${i}`}
                 >
                   Learn more <ArrowUpRight size={13} strokeWidth={2.5} />
@@ -217,10 +217,10 @@ export default function Home() {
             >
               <img src={svc.img} alt={svc.tag} className="w-full h-full object-cover opacity-70" />
               <div className="absolute bottom-0 left-0 right-0 p-6" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, transparent 100%)" }}>
-                <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest uppercase px-2.5 py-1 rounded-sm mb-3">{svc.tag}</span>
+                <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest px-2.5 py-1 rounded-sm mb-3">{svc.tag}</span>
                 <h3 className="text-lg font-bold mb-2 tracking-tight">{svc.title}</h3>
                 <p className="text-[12px] text-white/70 leading-relaxed mb-3">{svc.desc}</p>
-                <span className="text-[12px] font-bold tracking-wider uppercase text-[#58E3EA] flex items-center gap-1.5">
+                <span className="text-[12px] font-bold tracking-wider text-[#58E3EA] flex items-center gap-1.5">
                   Learn more <ArrowUpRight size={13} strokeWidth={2.5} />
                 </span>
               </div>

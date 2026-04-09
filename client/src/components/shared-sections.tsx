@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, Shield, FileText, CheckCircle2, X } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Mail, MapPin, Shield, FileText, CheckCircle2, X } from "lucide-react";
 import { SERVICE_AREA, SURROUNDING_AREA } from "@/lib/cities";
 import inspectionBg from "@assets/inspection-2_1773362648618.jpg";
 import insuranceBg from "@assets/insurance-2_1773362648618.jpg";
@@ -68,7 +68,7 @@ export function GuidedProcess() {
                 )}
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className={`text-[10px] font-bold tracking-[0.14em] uppercase transition-colors ${activeStep === i ? "text-[#58E3EA]" : "text-white/[0.28]"}`}>
+                <span className={`text-[10px] font-bold tracking-[0.14em] transition-colors ${activeStep === i ? "text-[#58E3EA]" : "text-white/[0.28]"}`}>
                   {s.num}
                 </span>
                 <span className={`text-[13px] leading-snug transition-colors ${activeStep === i ? "text-white font-bold" : "text-white/[0.42] font-semibold"}`}>
@@ -95,7 +95,7 @@ export function GuidedProcess() {
                 </>
               )}
               <div className="relative z-10 flex flex-col justify-end h-full px-14 pb-14 pt-16">
-                <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-4">
+                <div className="text-[10px] font-extrabold tracking-[0.18em] text-[#58E3EA] mb-4">
                   Step {step.num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
                 </div>
                 <h3 className="text-[clamp(20px,2.2vw,30px)] font-extrabold tracking-tight leading-[1.15] mb-4 text-white">
@@ -126,7 +126,7 @@ export function GuidedProcess() {
               </>
             )}
             <div className="relative z-10 p-5 flex flex-col justify-end">
-              <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA] mb-2">
+              <div className="text-[10px] font-extrabold tracking-[0.18em] text-[#58E3EA] mb-2">
                 Step {s.num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
               </div>
               <h3 className="text-lg font-extrabold tracking-tight leading-[1.2] text-white">
@@ -187,7 +187,7 @@ export function GuidedProcess() {
 
                 {/* Top bar */}
                 <div className="relative z-10 flex items-center justify-between px-6 pt-14 pb-4">
-                  <div className="text-[10px] font-extrabold tracking-[0.18em] uppercase text-[#58E3EA]">
+                  <div className="text-[10px] font-extrabold tracking-[0.18em] text-[#58E3EA]">
                     Step {PROCESS_STEPS[expandedStep].num} of {String(PROCESS_STEPS.length).padStart(2, "0")}
                   </div>
                   <button
@@ -311,7 +311,7 @@ export function CTASection() {
       <div className="flex flex-col gap-5 max-w-md w-full">
         <div>
           <p className="text-white/80 font-semibold mb-1 text-[24px]">Check your service area</p>
-          <p className="text-white/45 text-sm leading-relaxed">Enter your property address</p>
+          <p className="text-white/45 text-sm leading-relaxed">We promise not sell, share, or otherwise abuse the information you choose to share.</p>
         </div>
 
         <div>
@@ -392,20 +392,9 @@ export function SiteFooter() {
           <p className="text-[13px] text-white/50 leading-relaxed max-w-[280px]">
             Minneapolis-based exterior contractors you can count on. Locally owned.
           </p>
-          <div className="flex gap-3 mt-1">
-            <div className="w-9 h-9 border border-white/15 rounded-sm flex items-center justify-center cursor-pointer transition-all hover:border-[#58E3EA] hover:bg-[#58E3EA]/10" data-testid="button-social-facebook">
-              <Facebook size={16} className="text-white/60" />
-            </div>
-            <div className="w-9 h-9 border border-white/15 rounded-sm flex items-center justify-center cursor-pointer transition-all hover:border-[#58E3EA] hover:bg-[#58E3EA]/10" data-testid="button-social-instagram">
-              <Instagram size={16} className="text-white/60" />
-            </div>
-            <div className="w-9 h-9 border border-white/15 rounded-sm flex items-center justify-center cursor-pointer transition-all hover:border-[#58E3EA] hover:bg-[#58E3EA]/10" data-testid="button-social-linkedin">
-              <Linkedin size={16} className="text-white/60" />
-            </div>
-          </div>
         </div>
         <div>
-          <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#58E3EA] mb-5">Services</h4>
+          <h4 className="text-[11px] font-bold tracking-[0.15em] text-[#58E3EA] mb-5">Services</h4>
           <ul className="flex flex-col gap-3">
             <li><button onClick={() => navigate("/services/roofing")} className="text-[13px] text-white/55 hover:text-white transition-colors">Roofing</button></li>
             <li><button onClick={() => navigate("/services/siding")} className="text-[13px] text-white/55 hover:text-white transition-colors">Siding</button></li>
@@ -414,14 +403,14 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#58E3EA] mb-5">Company</h4>
+          <h4 className="text-[11px] font-bold tracking-[0.15em] text-[#58E3EA] mb-5">Company</h4>
           <ul className="flex flex-col gap-3">
             <li><button onClick={() => navigate("/about")} className="text-[13px] text-white/55 hover:text-white transition-colors">About Us</button></li>
             <li><button onClick={() => navigate("/estimate")} className="text-[13px] text-white/55 hover:text-white transition-colors">Contact</button></li>
           </ul>
         </div>
         <div>
-          <h4 className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#58E3EA] mb-5">Contact</h4>
+          <h4 className="text-[11px] font-bold tracking-[0.15em] text-[#58E3EA] mb-5">Contact</h4>
           <ul className="flex flex-col gap-3">
             <li><a href="mailto:hello@docoexteriors.com" className="text-[13px] text-white/55 hover:text-white transition-colors flex items-center gap-2"><Mail size={12} /> hello@docoexteriors.com</a></li>
             <li><span className="text-[13px] text-white/55 flex items-center gap-2"><MapPin size={12} /> Minneapolis, MN</span></li>
@@ -432,10 +421,14 @@ export function SiteFooter() {
       </div>
       <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-[12px] text-white/30">
-          &copy; 2025 DOCO Exteriors. All rights reserved. Locally owned and operated.
+          &copy; {new Date().getFullYear()} DOCO Exteriors. All rights reserved. Locally owned and operated.
         </p>
-        <p className="text-[12px] text-white/30">
-          <a href="#" className="text-[#58E3EA]">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="#" className="text-[#58E3EA]">Terms of Service</a>
+        <p className="text-[12px] text-white/30 flex items-center gap-3">
+          <button onClick={() => navigate("/privacy-policy")} className="text-white/40 hover:text-white transition-colors">Privacy Policy</button>
+          <span className="text-white/20">&middot;</span>
+          <button onClick={() => navigate("/terms-of-service")} className="text-white/40 hover:text-white transition-colors">Terms of Use</button>
+          <span className="text-white/20">&middot;</span>
+          <button onClick={() => navigate("/cookie-notice")} className="text-white/40 hover:text-white transition-colors">Cookie Notice</button>
         </p>
       </div>
     </footer>
@@ -467,9 +460,9 @@ export function SiteNav({ variant = "subpage" }: { variant?: "home" | "subpage" 
       </div>
       {variant !== "subpage" && (
         <ul className="hidden md:flex items-center gap-9 list-none absolute left-1/2 -translate-x-1/2">
-          <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
-          <li><button onClick={() => navigate("/#services")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
-          <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider uppercase text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
+          <li><button onClick={() => navigate("/about")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-about">About</button></li>
+          <li><button onClick={() => navigate("/#services")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-services">Services</button></li>
+          <li><button onClick={() => navigate("/estimate")} className="text-[13px] font-medium tracking-wider text-white/70 hover:text-[#58E3EA] transition-colors" data-testid="link-nav-contact">Contact</button></li>
         </ul>
       )}
       <button
@@ -507,10 +500,10 @@ export function OtherServicesSection({ currentSlug }: { currentSlug: string }) {
           >
             <img src={svc.img} alt={svc.tag} className="w-full h-full object-cover transition-transform duration-600 opacity-70 group-hover:scale-[1.06] group-hover:opacity-85" />
             <div className="absolute bottom-0 left-0 right-0 p-7" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, transparent 100%)" }}>
-              <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest uppercase px-2.5 py-1 rounded-sm mb-3">{svc.tag}</span>
+              <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest px-2.5 py-1 rounded-sm mb-3">{svc.tag}</span>
               <h3 className="text-xl font-bold mb-2.5 tracking-tight text-white">{svc.title}</h3>
               <p className="text-[13px] text-white/70 leading-relaxed mb-4">{svc.desc}</p>
-              <span className="text-[12px] font-bold tracking-wider uppercase text-[#58E3EA] flex items-center gap-1.5 transition-all group-hover:gap-2.5">
+              <span className="text-[12px] font-bold tracking-wider text-[#58E3EA] flex items-center gap-1.5 transition-all group-hover:gap-2.5">
                 Learn more <ArrowUpRight size={13} strokeWidth={2.5} />
               </span>
             </div>

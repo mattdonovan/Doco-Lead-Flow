@@ -25,9 +25,9 @@ const SERVICES: Record<string, ServiceData> = {
     description: "Your roof is your home's first line of defense against Minnesota's harsh weather. From storm damage repairs to complete replacements, DOCO Exteriors delivers professional roofing solutions that protect your family and investment for decades to come.",
     features: [
       { title: "Full Roof Replacement", desc: "Complete tear-off and installation with premium materials rated for Minnesota's climate. We ensure proper ventilation, ice and water shield, and industry-leading underlayment systems." },
-      { title: "Storm Damage Repair", desc: "Rapid response for hail, wind, and storm damage. We document all damage thoroughly and work directly with your insurance company to ensure your claim covers the necessary repairs." },
+      { title: "Storm Damage Repair", desc: "Rapid response for hail, wind, and storm damage. We document all damage throughly for your insurance company to ensure you receive the necessary repairs." },
       { title: "Architectural Shingles", desc: "Upgrade your home's curb appeal with dimensional architectural shingles that offer superior wind resistance, longer warranties, and a more distinguished appearance." },
-      { title: "Metal Roofing", desc: "Long-lasting metal roofing solutions that can withstand extreme weather, reduce energy costs, and provide decades of maintenance-free protection for your home." },
+      { title: "Repairs", desc: "Expert roofing repair services. We provide repairs quickly, safely, and built to last." },
     ],
     benefits: [
       "Licensed and insured crews with 15+ years experience",
@@ -148,7 +148,7 @@ export default function ServicePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest uppercase px-3 py-1.5 rounded-sm mb-6">
+            <span className="inline-block bg-[#58E3EA] text-[#0A0A0A] text-[10px] font-extrabold tracking-widest px-3 py-1.5 rounded-sm mb-6">
               {service.title}
             </span>
             <h1 className="text-[clamp(36px,5vw,64px)] font-extrabold leading-[1.05] tracking-tight mb-6" data-testid="text-service-headline">

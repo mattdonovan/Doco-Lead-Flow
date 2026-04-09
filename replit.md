@@ -6,7 +6,7 @@ Lead-gen website for DOCO Exteriors, a Minneapolis exterior contractor. Features
 ## Tech Stack
 - **Frontend**: React + Vite, Wouter (routing), Framer Motion, TanStack Query, Tailwind CSS
 - **Backend**: Express.js, Drizzle ORM, PostgreSQL
-- **Email**: Resend API — sends form submissions to iam.mattdonovan@gmail.com
+- **Email**: Resend API — sends form submissions to support@docoexteriors.com
 
 ## Design System
 - **Dark background**: `#0A0A0A`

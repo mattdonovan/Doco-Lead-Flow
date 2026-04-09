@@ -98,7 +98,7 @@ async function sendQuoteEmail(quote: {
 
   const { error } = await resend.emails.send({
     from: "DOCO Exteriors <onboarding@resend.dev>",
-    to: "iam.mattdonovan@gmail.com",
+    to: "support@docoexteriors.com",
     replyTo: quote.email,
     subject: `New Estimate Request: ${quote.firstName} ${quote.lastName} — ${quote.services.join(", ")}`,
     html,
@@ -142,7 +142,7 @@ async function sendNotifyEmail(email: string, city: string) {
 
   const { error } = await resend.emails.send({
     from: "DOCO Exteriors <onboarding@resend.dev>",
-    to: "iam.mattdonovan@gmail.com",
+    to: "support@docoexteriors.com",
     replyTo: email,
     subject: `Expansion Interest: ${safeCity}, MN — ${safeEmail}`,
     html,
@@ -232,7 +232,7 @@ async function sendDetailUpdateEmail(quote: {
 
   const { error } = await resend.emails.send({
     from: "DOCO Exteriors <onboarding@resend.dev>",
-    to: "iam.mattdonovan@gmail.com",
+    to: "support@docoexteriors.com",
     replyTo: quote.email,
     subject: `Lead Update: ${fn} ${ln} — Additional Details`,
     html,
@@ -286,7 +286,7 @@ export async function registerRoutes(
       services: ["Roofing", "Siding", "Windows", "Gutters"],
       serviceArea: SERVICE_AREA,
       estimateFormUrl: "https://docoexteriors.com/estimate",
-      contact: { email: "iam.mattdonovan@gmail.com" },
+      contact: { email: "support@docoexteriors.com" },
     });
   });
 

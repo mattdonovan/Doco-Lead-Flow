@@ -314,7 +314,7 @@ function BookingScreen({
                 href="https://cal.com/matt-donovan-uztzdy/estimate-visit"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-6 py-3 rounded transition-all hover:bg-[#3ABFC6]"
+                className="inline-flex items-center gap-2 bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider px-6 py-3 rounded transition-all hover:bg-[#3ABFC6]"
               >
                 Open Booking Page
                 <ArrowUpRight size={14} strokeWidth={2.5} />
@@ -340,7 +340,7 @@ function BookingScreen({
         <div className="text-center py-6">
           <button
             onClick={onBack}
-            className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+            className="text-white/50 text-[13px] font-semibold tracking-wider hover:text-white transition-colors"
           >
             ← Back
           </button>
@@ -652,7 +652,7 @@ export default function EstimatePage() {
             <ChevronLeft size={16} />
             <DocoLogo height={18} />
           </button>
-          <span className="text-[11px] font-bold tracking-wider uppercase text-white/40">
+          <span className="text-[11px] font-bold tracking-wider text-white/40">
             {detailStep + 1} of {totalDetailSteps}
           </span>
         </div>
@@ -670,7 +670,7 @@ export default function EstimatePage() {
                     <div className="flex items-start gap-3 mb-8">
                       <DocoAvatar />
                       <div>
-                        <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase text-[#58E3EA] mb-1">{currentServiceLabel}</span>
+                        <span className="inline-block text-[10px] font-extrabold tracking-widest text-[#58E3EA] mb-1">{currentServiceLabel}</span>
                         <p className="text-lg md:text-xl font-semibold text-white leading-snug" data-testid="text-detail-question">
                           {currentQuestions.q1.question}
                         </p>
@@ -759,7 +759,7 @@ export default function EstimatePage() {
                     </div>
                     {Object.entries(HOME_CONTEXT_CHIPS).map(([category, chips]) => (
                       <div key={category} className="mb-6">
-                        <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">{category}</p>
+                        <p className="text-[11px] font-bold tracking-wider text-white/40 mb-3">{category}</p>
                         <div className="flex flex-wrap gap-2">
                           {chips.map(chip => {
                             const selected = homeContext.includes(chip);
@@ -798,7 +798,7 @@ export default function EstimatePage() {
             <button
               onClick={handleDetailNext}
               disabled={detailMutation.isPending}
-              className="text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded inline-flex items-center gap-2 transition-all bg-[#58E3EA] text-[#0A0A0A] hover:bg-[#3ABFC6] hover:-translate-y-0.5 cursor-pointer"
+              className="text-sm font-bold tracking-wider px-8 py-3.5 rounded inline-flex items-center gap-2 transition-all bg-[#58E3EA] text-[#0A0A0A] hover:bg-[#3ABFC6] hover:-translate-y-0.5 cursor-pointer"
               data-testid="button-detail-step-next"
             >
               {detailMutation.isPending ? (
@@ -836,7 +836,7 @@ export default function EstimatePage() {
               <p className="text-white/40 text-sm mb-8">Confirmation sent to <span className="text-[#58E3EA]">{formData.email}</span></p>
               <button
                 onClick={() => navigate("/")}
-                className="text-white/50 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+                className="text-white/50 text-[13px] font-semibold tracking-wider hover:text-white transition-colors"
               >
                 Back to Home
               </button>
@@ -849,7 +849,7 @@ export default function EstimatePage() {
                     <MapPin size={14} className="text-[#58E3EA] mt-0.5 shrink-0" />
                     <span className="text-sm font-semibold text-white leading-snug">{formData.address || formData.city}</span>
                     {formData.cityType === "surrounding" && (
-                      <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded shrink-0">Expanding Soon</span>
+                      <span className="text-[10px] font-bold tracking-wider text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded shrink-0">Expanding Soon</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -858,7 +858,7 @@ export default function EstimatePage() {
                   </div>
                 </div>
                 <div className="p-5 border-b border-white/[0.06]">
-                  <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Services</p>
+                  <p className="text-[11px] font-bold tracking-wider text-white/40 mb-3">Services</p>
                   <div className="flex gap-3 flex-wrap">
                     {formData.services.map(svcId => {
                       const svc = SERVICES.find(s => s.id === svcId);
@@ -875,11 +875,11 @@ export default function EstimatePage() {
                 <div className="p-5">
                   <div className="grid grid-cols-2 gap-y-3 text-sm">
                     <div>
-                      <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Insurance</span>
+                      <span className="text-white/40 text-[11px] font-bold tracking-wider">Insurance</span>
                       <p className="text-white/80 mt-0.5">{formData.hasInsuranceClaim === true ? "Yes" : formData.hasInsuranceClaim === false ? "No" : "Not specified"}</p>
                     </div>
                     <div>
-                      <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Timeline</span>
+                      <span className="text-white/40 text-[11px] font-bold tracking-wider">Timeline</span>
                       <p className="text-white/80 mt-0.5">{TIMELINES.find(t => t.id === formData.projectTimeline)?.label}</p>
                     </div>
                   </div>
@@ -892,7 +892,7 @@ export default function EstimatePage() {
                     const svc = SERVICES.find(s => s.id === svcId);
                     return (
                       <div key={svcId} className="p-5 border-b border-white/[0.06] last:border-b-0">
-                        <p className="text-[10px] font-extrabold tracking-widest uppercase text-[#58E3EA] mb-3">{svc?.label}</p>
+                        <p className="text-[10px] font-extrabold tracking-widest text-[#58E3EA] mb-3">{svc?.label}</p>
                         {Object.entries(answers).map(([q, a]) => (
                           <div key={q} className="mb-2 last:mb-0">
                             <span className="text-[11px] text-white/40">{q}</span>
@@ -907,7 +907,7 @@ export default function EstimatePage() {
 
               {homeContext.length > 0 && (
                 <div className="bg-white/[0.03] border border-white/10 rounded-lg p-5">
-                  <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Additional Context</p>
+                  <p className="text-[11px] font-bold tracking-wider text-white/40 mb-3">Additional Context</p>
                   <div className="flex flex-wrap gap-2">
                     {homeContext.map(chip => (
                       <span key={chip} className="text-[12px] font-medium px-3 py-1.5 rounded-lg text-[#58E3EA] bg-[#58E3EA]/10 border border-[#58E3EA]/30">{chip}</span>
@@ -962,7 +962,7 @@ export default function EstimatePage() {
                 {!detailsSubmitted && (
                   <button
                     onClick={() => { setShowDetailFlow(true); setDetailStep(0); }}
-                    className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider uppercase px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
+                    className="bg-[#58E3EA] text-[#0A0A0A] text-sm font-bold tracking-wider px-8 py-4 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:bg-[#3ABFC6] hover:-translate-y-0.5"
                   >
                     Add More Details
                     <ArrowUpRight size={16} strokeWidth={2.5} />
@@ -970,7 +970,7 @@ export default function EstimatePage() {
                 )}
                 {bookingCompleted ? (
                   <div className="flex flex-col gap-4 items-center lg:items-start w-full">
-                    <div className="inline-flex items-center gap-2.5 text-[#58E3EA] text-sm font-bold tracking-wider uppercase">
+                    <div className="inline-flex items-center gap-2.5 text-[#58E3EA] text-sm font-bold tracking-wider">
                       <Check size={16} strokeWidth={2.5} />
                       Estimate Scheduled
                     </div>
@@ -978,18 +978,18 @@ export default function EstimatePage() {
                     {bookingDetails?.startTime && (
                       <div className="w-full bg-white/[0.03] border border-white/10 rounded-lg overflow-hidden text-left">
                         <div className="px-5 py-4 border-b border-white/[0.06]">
-                          <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-1">When</p>
+                          <p className="text-[10px] font-bold tracking-widest text-white/30 mb-1">When</p>
                           <p className="text-sm font-semibold text-white">{formatBookingDate(bookingDetails.startTime, bookingDetails.timezone)}</p>
                           <p className="text-sm text-white/60">{formatBookingTime(bookingDetails.startTime, bookingDetails.endTime, bookingDetails.timezone)}</p>
                         </div>
                         {(formData.address || formData.city) && (
                           <div className="px-5 py-4 border-b border-white/[0.06]">
-                            <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-1">Where</p>
+                            <p className="text-[10px] font-bold tracking-widest text-white/30 mb-1">Where</p>
                             <p className="text-sm text-white/70">{formData.address || formData.city}</p>
                           </div>
                         )}
                         <div className="px-5 py-4 border-b border-white/[0.06]">
-                          <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-2">Add to calendar</p>
+                          <p className="text-[10px] font-bold tracking-widest text-white/30 mb-2">Add to calendar</p>
                           <div className="flex gap-3 flex-wrap">
                             <a
                               href={buildGoogleCalUrl(bookingDetails, formData.address || formData.city)}
@@ -1010,7 +1010,7 @@ export default function EstimatePage() {
                         </div>
                         {bookingDetails.uid && (
                           <div className="px-5 py-4">
-                            <p className="text-[10px] font-bold tracking-widest uppercase text-white/30 mb-2">Need to make a change?</p>
+                            <p className="text-[10px] font-bold tracking-widest text-white/30 mb-2">Need to make a change?</p>
                             <div className="flex gap-4">
                               <a
                                 href={`https://cal.com/booking/${bookingDetails.uid}?reschedule=true`}
@@ -1036,7 +1036,7 @@ export default function EstimatePage() {
 
                     <button
                       onClick={() => navigate("/")}
-                      className="text-white/40 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+                      className="border border-white/20 text-white text-sm font-bold tracking-wider px-8 py-3.5 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:border-white/40"
                     >
                       Back to DOCO
                     </button>
@@ -1045,14 +1045,14 @@ export default function EstimatePage() {
                   <>
                     <button
                       onClick={() => setShowBooking(true)}
-                      className="border border-white/20 text-white text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:border-white/40"
+                      className="border border-white/20 text-white text-sm font-bold tracking-wider px-8 py-3.5 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:border-white/40"
                     >
                       Schedule an Estimate
                       <ArrowUpRight size={16} strokeWidth={2.5} />
                     </button>
                     <button
                       onClick={() => navigate("/")}
-                      className="text-white/40 text-[13px] font-semibold tracking-wider uppercase hover:text-white transition-colors"
+                      className="border border-white/20 text-white text-sm font-bold tracking-wider px-8 py-3.5 rounded cursor-pointer inline-flex items-center gap-2.5 transition-all hover:border-white/40"
                     >
                       Back to DOCO
                     </button>
@@ -1070,7 +1070,7 @@ export default function EstimatePage() {
                   <MapPin size={14} className="text-[#58E3EA] mt-0.5 shrink-0" />
                   <span className="text-sm font-semibold text-white leading-snug">{formData.address || formData.city}</span>
                   {formData.cityType === "surrounding" && (
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded shrink-0">Expanding Soon</span>
+                    <span className="text-[10px] font-bold tracking-wider text-yellow-400/70 bg-yellow-400/10 px-2 py-0.5 rounded shrink-0">Expanding Soon</span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
@@ -1079,7 +1079,7 @@ export default function EstimatePage() {
                 </div>
               </div>
               <div className="p-5 border-b border-white/[0.06]">
-                <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Services</p>
+                <p className="text-[11px] font-bold tracking-wider text-white/40 mb-3">Services</p>
                 <div className="flex gap-3 flex-wrap">
                   {formData.services.map(svcId => {
                     const svc = SERVICES.find(s => s.id === svcId);
@@ -1096,18 +1096,18 @@ export default function EstimatePage() {
               <div className={`p-5 ${serviceEntries.length > 0 || homeContext.length > 0 ? "border-b border-white/[0.06]" : ""}`}>
                 <div className="grid grid-cols-2 gap-y-3 text-sm">
                   <div>
-                    <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Insurance</span>
+                    <span className="text-white/40 text-[11px] font-bold tracking-wider">Insurance</span>
                     <p className="text-white/80 mt-0.5">{formData.hasInsuranceClaim === true ? "Yes" : formData.hasInsuranceClaim === false ? "No" : "Not specified"}</p>
                   </div>
                   <div>
-                    <span className="text-white/40 text-[11px] font-bold tracking-wider uppercase">Timeline</span>
+                    <span className="text-white/40 text-[11px] font-bold tracking-wider">Timeline</span>
                     <p className="text-white/80 mt-0.5">{TIMELINES.find(t => t.id === formData.projectTimeline)?.label}</p>
                   </div>
                 </div>
               </div>
               {serviceEntries.map(([svcId, answers], idx) => (
                 <div key={svcId} className={`p-5 ${idx < serviceEntries.length - 1 || homeContext.length > 0 ? "border-b border-white/[0.06]" : ""}`}>
-                  <p className="text-[10px] font-extrabold tracking-widest uppercase text-[#58E3EA] mb-3">{SERVICES.find(s => s.id === svcId)?.label}</p>
+                  <p className="text-[10px] font-extrabold tracking-widest text-[#58E3EA] mb-3">{SERVICES.find(s => s.id === svcId)?.label}</p>
                   {Object.entries(answers).map(([q, a]) => (
                     <div key={q} className="mb-2 last:mb-0">
                       <span className="text-[11px] text-white/40">{q}</span>
@@ -1118,7 +1118,7 @@ export default function EstimatePage() {
               ))}
               {homeContext.length > 0 && (
                 <div className="p-5">
-                  <p className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3">Additional Context</p>
+                  <p className="text-[11px] font-bold tracking-wider text-white/40 mb-3">Additional Context</p>
                   <div className="flex flex-wrap gap-2">
                     {homeContext.map(chip => (
                       <span key={chip} className="text-[12px] font-medium px-3 py-1.5 rounded-lg text-[#58E3EA] bg-[#58E3EA]/10 border border-[#58E3EA]/30">{chip}</span>
@@ -1174,7 +1174,7 @@ export default function EstimatePage() {
             <ChevronLeft size={16} />
             <DocoLogo height={28} />
           </button>
-          <span className="text-[11px] font-bold tracking-wider uppercase text-white/40">
+          <span className="text-[11px] font-bold tracking-wider text-white/40">
             Step {step + 1} of {TOTAL_STEPS}
           </span>
         </div>
@@ -1233,14 +1233,14 @@ export default function EstimatePage() {
                           <div className="flex gap-3">
                             <button
                               onClick={() => setSurroundingAcknowledged(true)}
-                              className="bg-[#58E3EA] text-[#0A0A0A] text-[12px] font-bold tracking-wider uppercase px-5 py-3 rounded transition-all hover:bg-[#3ABFC6]"
+                              className="bg-[#58E3EA] text-[#0A0A0A] text-[12px] font-bold tracking-wider px-5 py-3 rounded transition-all hover:bg-[#3ABFC6]"
                               data-testid="button-continue-anyway"
                             >
                               Continue with my estimate
                             </button>
                             <button
                               onClick={() => setNotifyMode(true)}
-                              className="border border-white/20 text-white text-[12px] font-bold tracking-wider uppercase px-5 py-3 rounded transition-all hover:border-[#58E3EA] hover:text-[#58E3EA] flex items-center gap-2"
+                              className="border border-white/20 text-white text-[12px] font-bold tracking-wider px-5 py-3 rounded transition-all hover:border-[#58E3EA] hover:text-[#58E3EA] flex items-center gap-2"
                               data-testid="button-notify-me"
                             >
                               <Bell size={13} /> Notify me
@@ -1249,7 +1249,7 @@ export default function EstimatePage() {
                         ) : (
                           <div className="flex gap-3 items-end">
                             <div className="flex-1">
-                              <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-1.5 block">Your email</label>
+                              <label className="text-[11px] font-bold tracking-wider text-white/40 mb-1.5 block">Your email</label>
                               <input
                                 type="email"
                                 placeholder="you@email.com"
@@ -1262,7 +1262,7 @@ export default function EstimatePage() {
                             <button
                               onClick={() => { if (isValidEmail(notifyEmail)) notifyMutation.mutate({ email: notifyEmail, city: formData.city }); }}
                               disabled={!isValidEmail(notifyEmail) || notifyMutation.isPending}
-                              className={`text-[12px] font-bold tracking-wider uppercase px-5 py-3 rounded transition-all ${
+                              className={`text-[12px] font-bold tracking-wider px-5 py-3 rounded transition-all ${
                                 isValidEmail(notifyEmail) && !notifyMutation.isPending
                                   ? "bg-[#58E3EA] text-[#0A0A0A] hover:bg-[#3ABFC6] cursor-pointer"
                                   : "bg-white/10 text-white/30 cursor-not-allowed"
@@ -1285,7 +1285,7 @@ export default function EstimatePage() {
                         <p className="text-[13px] text-white/50 mb-4">We'll let you know as soon as we start serving {formData.city}.</p>
                         <button
                           onClick={() => setSurroundingAcknowledged(true)}
-                          className="text-[12px] font-bold tracking-wider uppercase text-white/60 hover:text-white transition-colors"
+                          className="text-[12px] font-bold tracking-wider text-white/60 hover:text-white transition-colors"
                           data-testid="button-continue-after-notify"
                         >
                           Or continue with an estimate anyway &rarr;
@@ -1293,7 +1293,7 @@ export default function EstimatePage() {
                       </motion.div>
                     )}
 
-                    <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Property type</label>
+                    <label className="text-[11px] font-bold tracking-wider text-white/40 mb-3 block">Property type</label>
                     <div className="flex flex-col gap-3 mb-8" data-testid="input-property-type">
                       {PROPERTY_TYPES.map((pt) => {
                         const selected = formData.propertyType === pt.id;
@@ -1319,7 +1319,7 @@ export default function EstimatePage() {
 
                     {formData.propertyType && (
                       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-                        <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Which services are you interested in?</label>
+                        <label className="text-[11px] font-bold tracking-wider text-white/40 mb-3 block">Which services are you interested in?</label>
                         <div className="grid grid-cols-2 gap-3" data-testid="input-services">
                           {SERVICES.map((svc) => {
                             const selected = formData.services.includes(svc.id);
@@ -1361,7 +1361,7 @@ export default function EstimatePage() {
                 {step === 2 && (
                   <div className="mb-8 space-y-8">
                     <div>
-                      <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">Is this an insurance claim?</label>
+                      <label className="text-[11px] font-bold tracking-wider text-white/40 mb-3 block">Is this an insurance claim?</label>
                       <div className="flex gap-3">
                         {[
                           { val: true, label: "Yes" },
@@ -1384,7 +1384,7 @@ export default function EstimatePage() {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold tracking-wider uppercase text-white/40 mb-3 block">When are you looking to get started?</label>
+                      <label className="text-[11px] font-bold tracking-wider text-white/40 mb-3 block">When are you looking to get started?</label>
                       <div className="flex flex-col gap-2">
                         {TIMELINES.map((tl) => {
                           const selected = formData.projectTimeline === tl.id;
@@ -1414,7 +1414,7 @@ export default function EstimatePage() {
                 {step === 3 && (
                   <div className="mb-8">
                     <div className="space-y-4">
-                      <p className="text-[11px] font-bold tracking-wider uppercase text-white/40">Your Information</p>
+                      <p className="text-[11px] font-bold tracking-wider text-white/40">Your Information</p>
                       <input
                         type="text"
                         placeholder="Full name"
@@ -1475,7 +1475,7 @@ export default function EstimatePage() {
             <button
               onClick={goNext}
               disabled={!canProceed() || submitMutation.isPending}
-              className={`text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded inline-flex items-center gap-2 transition-all ${
+              className={`text-sm font-bold tracking-wider px-8 py-3.5 rounded inline-flex items-center gap-2 transition-all ${
                 canProceed() && !submitMutation.isPending
                   ? "bg-[#58E3EA] text-[#0A0A0A] hover:bg-[#3ABFC6] hover:-translate-y-0.5 cursor-pointer"
                   : "bg-white/10 text-white/30 cursor-not-allowed"
